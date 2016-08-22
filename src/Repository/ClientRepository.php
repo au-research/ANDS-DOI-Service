@@ -9,8 +9,6 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 class ClientRespository
 {
 
-    private $authenticatedClient = null;
-
     public function getFirst()
     {
         return Client::first();
@@ -44,47 +42,17 @@ class ClientRespository
         if ($sharedSecret &&
             $client->shared_secret === $sharedSecret
         ) {
-            $this->setAuthenticatedClient($client);
-            return true;
+            return $client;
         }
 
         // ip address matching
         if ($ipAddress &&
             IPValidator::validate($ipAddress, $client->ip_address)
         ) {
-            $this->setAuthenticatedClient($client);
-            return true;
+            return $client;
         }
 
         return false;
-    }
-
-    /**
-     * @return null
-     */
-    public function getAuthenticatedClient()
-    {
-        return $this->authenticatedClient;
-    }
-
-    /**
-     * Setting the current authenticated client for this object
-     *
-     * @param $client
-     */
-    public function setAuthenticatedClient($client)
-    {
-        $this->authenticatedClient = $client;
-    }
-
-    /**
-     * Returns if a client is authenticated
-     *
-     * @return bool
-     */
-    public function isClientAuthenticated()
-    {
-        return $this->getAuthenticatedClient() === null ? false : true;
     }
 
     /**

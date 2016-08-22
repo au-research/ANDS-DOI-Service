@@ -13,6 +13,17 @@ class DOIManagerTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($manager);
     }
 
+    /** @test */
+    public function it_should_authenticate_a_real_user()
+    {
+        $manager = $this->getManager();
+        $authenticate = $manager->authenticate(
+            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", "04b51aa4aa"
+        );
+        $this->assertTrue($authenticate);
+        $this->assertNotNull($manager->getAuthenticatedClient());
+    }
+
     /**
      * Helper method to create a DOIManager for every test
      *

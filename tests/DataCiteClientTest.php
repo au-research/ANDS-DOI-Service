@@ -1,6 +1,6 @@
 <?php
 
-use ANDS\DOI\DataCiteClient as DataCiteClient;
+use ANDS\DOI\DataCiteClient;
 
 class DataCiteClientTest extends PHPUnit_Framework_TestCase
 {
