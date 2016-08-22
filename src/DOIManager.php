@@ -2,22 +2,27 @@
 
 namespace ANDS\DOI;
 
+use ANDS\DOI\Repository\ClientRespository;
+
 /**
  * ANDS DOI Manager
  *
  * Class DOIManager
  * @author Minh Duc Nguyen <minh.nguyen@ands.org.au>
- * @package ANDS\API\DOI
+ * @package ANDS\DOI\Repository
  */
 class DOIManager
 {
 
+    private $clientRepo = null;
+
     /**
      * DOIManager constructor.
+     * @param ClientRespository $clientRespository
      */
-    public function __construct()
+    public function __construct(ClientRespository $clientRespository)
     {
-        // require the clientRepository
+        $this->clientRepo = $clientRespository;
     }
 
     /**

@@ -4,7 +4,6 @@ namespace ANDS\DOI\Repository;
 
 use ANDS\DOI\Validator\IPValidator;
 use ANDS\DOI\Model\Client as Client;
-use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ClientRespository
@@ -30,8 +29,11 @@ class ClientRespository
      * @param null $ipAddress
      * @return bool
      */
-    public function authenticate($appID, $sharedSecret = null, $ipAddress = null)
-    {
+    public function authenticate(
+        $appID,
+        $sharedSecret = null,
+        $ipAddress = null
+    ) {
         $client = Client::where('app_id', $appID)->first();
 
         if ($client === null) {
@@ -40,14 +42,16 @@ class ClientRespository
 
         // shared secret matching
         if ($sharedSecret &&
-            $client->shared_secret === $sharedSecret) {
+            $client->shared_secret === $sharedSecret
+        ) {
             $this->setAuthenticatedClient($client);
             return true;
         }
 
         // ip address matching
         if ($ipAddress &&
-            IPValidator::validate($ipAddress, $client->ip_address)) {
+            IPValidator::validate($ipAddress, $client->ip_address)
+        ) {
             $this->setAuthenticatedClient($client);
             return true;
         }
@@ -85,23 +89,29 @@ class ClientRespository
 
     /**
      * ClientRespository constructor.
+     * @param $databaseURL
+     * @param string $database
+     * @param string $username
+     * @param string $password
+     * @internal param string $databasePassword
      */
-    public function __construct()
-    {
-        $dotenv = new Dotenv(__DIR__.'/../../');
-        $dotenv->load();
-
+    public function __construct(
+        $databaseURL,
+        $database = "dbs_dois",
+        $username = "webuser",
+        $password = ""
+    ) {
         $capsule = new Capsule;
         $capsule->addConnection(
             [
-                'driver'    => 'mysql',
-                'host'      => getenv("DATABASE_URL"),
-                'database'  => 'dbs_dois',
-                'username'  => getenv("DATABASE_USERNAME"),
-                'password'  => getenv("DATABASE_PASSWORD"),
-                'charset'   => 'utf8',
+                'driver' => 'mysql',
+                'host' => $databaseURL,
+                'database' => $database,
+                'username' => $username,
+                'password' => $password,
+                'charset' => 'utf8',
                 'collation' => 'utf8_unicode_ci',
-                'prefix'    => '',
+                'prefix' => '',
             ], 'default'
         );
         $capsule->setAsGlobal();
