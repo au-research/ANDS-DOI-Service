@@ -11,7 +11,7 @@
     "scripts": {
         "test": [
             "@clearTestReports",
-            "vendor/bin/phpunit --log-junit tests/reports/junit.xml"
+            "vendor/bin/phpunit --log-junit tests/reports/junit.xml --coverage-xml tests/reports/coverage/"
         ],
         "clearTestReports": "rm -rf tests/reports/*"
     },
