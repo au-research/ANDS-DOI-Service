@@ -1,7 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "ANDS\\API\\DOI\\": "src"
+            "ANDS\\DOI\\": "src"
         }
     },
     "require-dev": {

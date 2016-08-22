@@ -1,5 +1,7 @@
 <?php
 
+use ANDS\DOI\DataCiteClient as DataCiteClient;
+
 class DataCiteClientTest extends PHPUnit_Framework_TestCase
 {
 
@@ -90,7 +92,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $username = getenv('DATACITE_USERNAME');
         $password = getenv('DATACITE_PASSWORD');
 
-        $client = new ANDS\API\DOI\DataCiteClient($username, $password);
+        $client = new DataCiteClient($username, $password);
         $client->setDataciteUrl(getenv('DATACITE_URL'));
 
         return $client;

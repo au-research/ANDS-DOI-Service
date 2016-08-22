@@ -1,6 +1,6 @@
 <?php
 
-namespace ANDS\API\DOI;
+namespace ANDS\DOI;
 
 /**
  * ANDS DOI Manager

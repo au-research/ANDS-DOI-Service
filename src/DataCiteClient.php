@@ -1,6 +1,6 @@
 <?php
 
-namespace ANDS\API\DOI;
+namespace ANDS\DOI;
 
 /**
  * A Client that interfaces with datacite.org
