@@ -22,6 +22,17 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         );
         $this->assertTrue($authenticate);
         $this->assertNotNull($sp->getAuthenticatedClient());
+        $this->assertTrue($sp->isClientAuthenticated());
+    }
+
+    /** @test **/
+    public function it_should_not_authenticate_a_fake_user()
+    {
+        $sp = $this->getServiceProvider();
+        $authenticate = $sp->authenticate("asdf");
+        $this->assertFalse($authenticate);
+        $this->assertNull($sp->getAuthenticatedClient());
+        $this->assertFalse($sp->isClientAuthenticated());
     }
 
     /**
