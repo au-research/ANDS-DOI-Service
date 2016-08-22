@@ -1,7 +1,7 @@
 <?php
 
 use ANDS\DOI\Model\Client;
-use ANDS\DOI\Repository\ClientRespository;
+use ANDS\DOI\Repository\ClientRepository;
 use Dotenv\Dotenv;
 
 class ClientRepositoryTest extends PHPUnit_Framework_TestCase
@@ -71,7 +71,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     private function getClientRepository() {
         $dotenv = new Dotenv('./');
         $dotenv->load();
-        $repo = new ClientRespository(
+        $repo = new ClientRepository(
             getenv("DATABASE_URL"),
             'dbs_dois',
             getenv("DATABASE_USERNAME"),

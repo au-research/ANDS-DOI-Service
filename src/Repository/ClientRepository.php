@@ -6,7 +6,7 @@ use ANDS\DOI\Validator\IPValidator;
 use ANDS\DOI\Model\Client as Client;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-class ClientRespository
+class ClientRepository
 {
 
     public function getFirst()

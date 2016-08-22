@@ -2,26 +2,26 @@
 
 namespace ANDS\DOI;
 
-use ANDS\DOI\Repository\ClientRespository;
+use ANDS\DOI\Repository\ClientRepository;
 
 /**
- * ANDS DOI Manager
+ * ANDS DOI Service Provider
  *
- * Class DOIManager
+ * Class DOIServiceProvider
  * @author Minh Duc Nguyen <minh.nguyen@ands.org.au>
  * @package ANDS\DOI\Repository
  */
-class DOIManager
+class DOIServiceProvider
 {
 
     private $clientRepo = null;
     private $authenticatedClient = null;
 
     /**
-     * DOIManager constructor.
-     * @param ClientRespository $clientRespository
+     * DOIServiceProvider constructor.
+     * @param ClientRepository $clientRespository
      */
-    public function __construct(ClientRespository $clientRespository)
+    public function __construct(ClientRepository $clientRespository)
     {
         $this->clientRepo = $clientRespository;
     }

@@ -8,6 +8,13 @@
             "email": "minh.nguyen@ands.org.au"
         }
     ],
+    "scripts": {
+        "test": [
+            "@clearTestReports",
+            "vendor/bin/phpunit --log-junit tests/reports/junit.xml"
+        ],
+        "clearTestReports": "rm -rf tests/reports/*"
+    },
     "autoload": {
         "psr-4": {
             "ANDS\\DOI\\": "src"
