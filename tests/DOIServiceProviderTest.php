@@ -18,7 +18,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $sp = $this->getServiceProvider();
         $authenticate = $sp->authenticate(
-            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", "04b51aa4aa"
+            getenv("TEST_CLIENT_APPID"), getenv("TEST_CLIENT_SHAREDSECRET")
         );
         $this->assertTrue($authenticate);
         $this->assertNotNull($sp->getAuthenticatedClient());

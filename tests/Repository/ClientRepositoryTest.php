@@ -28,7 +28,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getClientRepository();
         $authenticate = $repo->authenticate(
-            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", "04b51aa4aa"
+            getenv("TEST_CLIENT_APPID"), getenv("TEST_CLIENT_SHAREDSECRET")
         );
         $this->assertNotFalse($authenticate);
     }
@@ -38,7 +38,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getClientRepository();
         $authenticate = $repo->authenticate(
-            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", "asdfasdfasdf"
+            getenv("TEST_CLIENT_APPID"), "randompasswordthatdoesnotmatch"
         );
         $this->assertFalse($authenticate);
     }
@@ -48,7 +48,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getClientRepository();
         $client = $repo->authenticate(
-            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", null, "130.56.111.120"
+            getenv("TEST_CLIENT_APPID"), null, "130.56.111.120"
         );
         $this->assertInstanceOf(Client::class, $client);
     }
@@ -58,7 +58,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getClientRepository();
         $authenticate = $repo->authenticate(
-            "94c5cdfc4183eca7f836f06f1ec5b85a4932758b", null, "130.56.111.11"
+            getenv("TEST_CLIENT_APPID"), null, "130.56.111.11"
         );
         $this->assertFalse($authenticate);
     }
