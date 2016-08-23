@@ -75,6 +75,7 @@ class DOIServiceProvider
     public function setAuthenticatedClient($client)
     {
         $this->authenticatedClient = $client;
+        $this->setResponse('app_id', $client->app_id);
         return $this;
     }
 

@@ -68,6 +68,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $message = $formatter->format($response);
 
         $sxml = new SimpleXMLElement($message);
+        dd($sxml);
         $this->assertEquals("MT001", (string) $sxml->responsecode);
         $this->assertEquals($response['doi'], (string) $sxml->doi);
     }
