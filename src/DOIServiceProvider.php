@@ -17,6 +17,7 @@ class DOIServiceProvider
     private $clientRepo = null;
     private $dataciteClient = null;
     private $authenticatedClient = null;
+    private $response = null;
 
     /**
      * DOIServiceProvider constructor.
@@ -111,7 +112,7 @@ class DOIServiceProvider
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
         // @todo gather response
-        // $this->response(something)
+        $this->response = $this->dataciteClient->getResponse();
 
         return $result;
     }
@@ -182,5 +183,10 @@ class DOIServiceProvider
     public function deactivate()
     {
         // @todo
+    }
+
+    public function getResponse()
+    {
+        return $this->response();
     }
 }
