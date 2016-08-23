@@ -3,6 +3,7 @@
 namespace ANDS\DOI;
 
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Validator\URLValidator;
 use ANDS\DOI\Validator\XMLValidator;
 
 /**
@@ -54,7 +55,7 @@ class DOIServiceProvider
             return true;
         }
 
-        // @todo throw response
+        $this->setResponse('responsecode', 'MT009');
         return false;
     }
 
@@ -98,8 +99,13 @@ class DOIServiceProvider
             return false;
         }
 
-        // @todo validate url, url domain
+        // Validate URL and URL Domain
         $this->setResponse('url', $url);
+        $validDomain = URLValidator::validDomains($url, $this->getAuthenticatedClient()->domains);
+        if (!$validDomain) {
+            $this->setResponse("responsecode", "MT014");
+            return false;
+        }
 
         // @todo validate xml, xml schema
 
@@ -112,11 +118,15 @@ class DOIServiceProvider
         // replaced doiValue
         $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
 
+        //update the database DOIRepository
+        //@todo add a DOI to the database it should be REQUESTED
+
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
+            // @todo set the DOI created earlier status to ACTIVE
         } else {
             $this->setResponse('responsecode', 'MT005');
         }
