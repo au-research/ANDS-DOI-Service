@@ -1,6 +1,7 @@
 <?php
 
 use ANDS\DOI\DataCiteClient;
+use ANDS\DOI\Validator\XMLValidator;
 
 class DataCiteClientTest extends PHPUnit_Framework_TestCase
 {
@@ -45,8 +46,10 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $client = $this->getClient();
         $xml = file_get_contents(__DIR__."/sample.xml");
 
+        $doi = "10.5072/00/".uniqid();
+        $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $client->mint(
-            "10.5072/00/56610ec83d432", "https://devl.ands.org.au/minh/", $xml
+            $doi, "https://devl.ands.org.au/minh/", $xml
         );
 
         $this->assertTrue($response);

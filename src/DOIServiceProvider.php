@@ -3,6 +3,7 @@
 namespace ANDS\DOI;
 
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Validator\XMLValidator;
 
 /**
  * ANDS DOI Service Provider
@@ -105,7 +106,7 @@ class DOIServiceProvider
         // validation on the DOIValue
 
         // replaced doiValue
-        $xml = $this->replaceDOIValue($doiValue, $xml);
+        $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
 
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
@@ -134,40 +135,7 @@ class DOIServiceProvider
         return $prefix . $doiValue;
     }
 
-    /**
-     * Replaces the DOI Identifier value in the provided XML
-     *
-     * @param $doiValue
-     * @param $xml
-     * @return string
-     */
-    private function replaceDOIValue($doiValue, $xml)
-    {
-        $doiXML = new \DOMDocument();
-        $doiXML->loadXML($xml);
 
-        // remove the current identifier
-        $currentIdentifier = $doiXML->getElementsByTagName('identifier');
-        for ($i = 0; $i < $currentIdentifier->length; $i++) {
-            $doiXML
-                ->getElementsByTagName('resource')
-                ->item(0)
-                ->removeChild($currentIdentifier->item($i));
-        }
-
-        // add new identifier to the DOM
-        $newIdentifier = $doiXML->createElement('identifier', $doiValue);
-        $newIdentifier->setAttribute('identifierType', "DOI");
-        $doiXML
-            ->getElementsByTagName('resource')
-            ->item(0)
-            ->insertBefore(
-                $newIdentifier,
-                $doiXML->getElementsByTagName('resource')->item(0)->firstChild
-            );
-
-        return $doiXML->saveXML();
-    }
 
     public function update()
     {
