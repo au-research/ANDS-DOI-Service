@@ -19,6 +19,11 @@ class ClientRepository
         return Client::find($id);
     }
 
+    public function getByAppID($appID)
+    {
+        return Client::where('app_id', $appID)->first();
+    }
+
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *
