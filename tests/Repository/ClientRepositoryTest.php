@@ -23,6 +23,15 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($client->client_name, "Testing Auto Data Centre");
     }
 
+    /** @test **/
+    public function it_should_be_able_to_get_a_client_via_appid() {
+        $repo = $this->getClientRepository();
+        $client = $repo->getByAppID(getenv("TEST_CLIENT_APPID"));
+        $this->assertNotNull($client);
+        $this->assertEquals($client->client_id, 0);
+        $this->assertEquals($client->client_name, "Testing Auto Data Centre");
+    }
+
     /** @test */
     public function it_should_authenticate_the_right_user_if_has_shared_secret()
     {
@@ -66,7 +75,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     /**
      * Helper method to return a new ClientRepository for each test
      *
-     * @return ClientRespository
+     * @return ClientRepository
      */
     private function getClientRepository() {
         $dotenv = new Dotenv('./');
