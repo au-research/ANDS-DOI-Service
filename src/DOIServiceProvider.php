@@ -187,6 +187,6 @@ class DOIServiceProvider
 
     public function getResponse()
     {
-        return $this->response();
+        return $this->response;
     }
 }
