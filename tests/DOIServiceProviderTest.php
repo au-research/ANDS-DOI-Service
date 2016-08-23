@@ -1,8 +1,10 @@
 <?php
 
 use ANDS\DOI\DOIServiceProvider;
+use ANDS\DOI\Formatter\XMLFormatter;
 use ANDS\DOI\Model\Client;
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Validator\XMLValidator;
 use Dotenv\Dotenv;
 
 class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
@@ -47,6 +49,30 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint("http://devl.ands.org.au/minh/", $this->getTestXML());
         $this->assertTrue($result);
     }
+
+    /** @test **/
+    public function it_should_allow_minting_a_new_doi_and_return_good_message() {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+        $this->assertTrue($result);
+
+        $response = $service->getResponse();
+        $this->assertEquals("MT001", $response['responsecode']);
+
+        // test formater as well
+        $formatter = new XMLFormatter();
+        $message = $formatter->format($response);
+
+        $sxml = new SimpleXMLElement($message);
+        $this->assertEquals("MT001", (string) $sxml->responsecode);
+        $this->assertEquals($response['doi'], (string) $sxml->doi);
+    }
+
+
 
     /**
      * Helper method for getting the sample XML for testing purpose
