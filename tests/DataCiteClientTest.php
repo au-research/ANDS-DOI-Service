@@ -84,8 +84,10 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * not a test
-     * a helper method to return a new client instance
+     * Not a test
+     * A helper method to return a new client instance
+     *
+     * @return DataCiteClient
      */
     private function getClient()
     {

@@ -75,6 +75,7 @@ class DOIServiceProvider
     public function setAuthenticatedClient($client)
     {
         $this->authenticatedClient = $client;
+        $this->setResponse('app_id', $client->app_id);
         return $this;
     }
 
@@ -98,11 +99,13 @@ class DOIServiceProvider
         }
 
         // @todo validate url, url domain
+        $this->setResponse('url', $url);
 
         // @todo validate xml, xml schema
 
         // construct DOI
         $doiValue = $this->getNewDOI();
+        $this->setResponse('doi', $doiValue);
 
         // validation on the DOIValue
 
@@ -112,8 +115,11 @@ class DOIServiceProvider
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
-        // @todo gather response
-        $this->response = $this->dataciteClient->getResponse();
+        if ($result === true) {
+            $this->setResponse('responsecode', 'MT001');
+        } else {
+            $this->setResponse('responsecode', 'MT005');
+        }
 
         return $result;
     }
@@ -151,6 +157,12 @@ class DOIServiceProvider
     public function deactivate()
     {
         // @todo
+    }
+
+    public function setResponse($key, $value)
+    {
+        $this->response[$key] = $value;
+        return $this;
     }
 
     public function getResponse()
