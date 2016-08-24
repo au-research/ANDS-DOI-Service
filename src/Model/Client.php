@@ -25,6 +25,8 @@ class Client extends Model
      */
     public function domains()
     {
-        return $this->hasMany(ClientDomain::class, "client_id", "client_id");
+        return $this->hasMany(
+            ClientDomain::class, "client_id", "client_id"
+        );
     }
 }

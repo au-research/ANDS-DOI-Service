@@ -37,7 +37,7 @@ class ClientRepository
         $sharedSecret = null,
         $ipAddress = null
     ) {
-        $client = Client::where('app_id', $appID)->first();
+        $client = $this->getByAppID($appID);
 
         if ($client === null) {
             return false;

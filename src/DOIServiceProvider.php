@@ -101,7 +101,9 @@ class DOIServiceProvider
 
         // Validate URL and URL Domain
         $this->setResponse('url', $url);
-        $validDomain = URLValidator::validDomains($url, $this->getAuthenticatedClient()->domains);
+        $validDomain = URLValidator::validDomains(
+            $url, $this->getAuthenticatedClient()->domains
+        );
         if (!$validDomain) {
             $this->setResponse("responsecode", "MT014");
             return false;

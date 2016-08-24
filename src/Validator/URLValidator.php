@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mnguyen
- * Date: 23/08/2016
- * Time: 3:16 PM
- */
 
 namespace ANDS\DOI\Validator;
-
 
 class URLValidator
 {
