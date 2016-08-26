@@ -44,14 +44,13 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
     public function test_mint_a_new_doi()
     {
         $client = $this->getClient();
-        $xml = file_get_contents(__DIR__."/sample_invalid.xml");
+        $xml = file_get_contents(__DIR__."/sample.xml");
 
         $doi = "10.5072/00/".uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $client->mint(
             $doi, "https://devl.ands.org.au/minh/", $xml
         );
-        var_dump($client->getResponse());
         $this->assertTrue($response);
     }
 

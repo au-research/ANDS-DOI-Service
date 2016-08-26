@@ -16,8 +16,8 @@ class IPValidatorTest extends PHPUnit_Framework_TestCase
     /** @test **/
     public function it_should_valiodates_host_names()
     {
-        $this->assertTrue(IPValidator::validate('130.56.60.128', 'ands3.anu.edu.au'));
-        $this->assertFalse(IPValidator::validate('130.56.60.109', 'ands3.anu.edu.au'));
+        $this->assertTrue(IPValidator::validate('130.56.60.128', 'researchdata.ands.org.au'));
+        $this->assertFalse(IPValidator::validate('103.6.253.17', 'researchdata.ands.org.au'));
         $this->assertFalse(IPValidator::validate('hello world!#$%$#%', '130.56.62.129'));
     }
 

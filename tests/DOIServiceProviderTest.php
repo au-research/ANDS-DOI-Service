@@ -93,7 +93,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("failure", (string)$sxml->attributes()->type);
     }
 
-<<<<<<< HEAD
+
     /** @test **/
     public function it_should_not_allow_minting_a_new_doi_and_return_error_message()
     {
@@ -105,7 +105,12 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertFalse($result);
-=======
+
+        $response = $service->getResponse();
+
+        $this->assertEquals("MT006", $response['responsecode']);
+    }
+
     /** @test * */
     public function it_should_disallow_minting_of_url_not_in_top_domain()
     {
@@ -123,12 +128,8 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals("MT014", (string)$sxml->responsecode);
         $this->assertEquals("failure", (string)$sxml->attributes()->type);
-    }
->>>>>>> 6efdd1f94e6814fab54161f6c97a70014bf64eae
 
-        $response = $service->getResponse();
 
-        $this->assertEquals("MT006", $response['responsecode']);
     }
 
     /**
