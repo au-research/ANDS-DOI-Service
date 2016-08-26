@@ -171,8 +171,11 @@ class DOIServiceProvider
             $prefix = "10.5072";
         }
 
+        $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
+
         $doiValue = uniqid();
-        return $prefix . $doiValue;
+
+        return $prefix . $client_id . $doiValue;
     }
 
 
