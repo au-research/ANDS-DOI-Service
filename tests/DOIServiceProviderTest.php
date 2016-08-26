@@ -28,7 +28,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($sp->isClientAuthenticated());
     }
 
-    /** @test **/
+    /** @test * */
     public function it_should_not_authenticate_a_fake_user()
     {
         $sp = $this->getServiceProvider();
@@ -38,7 +38,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($sp->isClientAuthenticated());
     }
 
-    /** @test **/
+    /** @test * */
     public function it_should_allow_a_client_to_mint()
     {
         $service = $this->getServiceProvider();
@@ -46,12 +46,15 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($service->isClientAuthenticated());
 
-        $result = $service->mint("http://devl.ands.org.au/minh/", $this->getTestXML());
+        $result = $service->mint(
+            "http://devl.ands.org.au/minh/", $this->getTestXML()
+        );
         $this->assertTrue($result);
     }
 
-    /** @test **/
-    public function it_should_allow_minting_a_new_doi_and_return_good_message() {
+    /** @test * */
+    public function it_should_allow_minting_a_new_doi_and_return_good_message()
+    {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
 
@@ -70,10 +73,27 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $message = $formatter->format($response);
 
         $sxml = new SimpleXMLElement($message);
-        $this->assertEquals("MT001", (string) $sxml->responsecode);
-        $this->assertEquals($response['doi'], (string) $sxml->doi);
+        $this->assertEquals("MT001", (string)$sxml->responsecode);
+        $this->assertEquals($response['doi'], (string)$sxml->doi);
     }
 
+    /** @test * */
+    public function it_should_disallow_minting_if_not_authorized()
+    {
+        $service = $this->getServiceProvider();
+        $result = $service->authenticate(uniqid());
+        $this->assertFalse($result);
+
+        $response = $service->getResponse();
+        $formatter = new XMLFormatter();
+        $message = $formatter->format($response);
+        $sxml = new SimpleXMLElement($message);
+
+        $this->assertEquals("MT009", (string)$sxml->responsecode);
+        $this->assertEquals("failure", (string)$sxml->attributes()->type);
+    }
+
+<<<<<<< HEAD
     /** @test **/
     public function it_should_not_allow_minting_a_new_doi_and_return_error_message()
     {
@@ -85,6 +105,26 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertFalse($result);
+=======
+    /** @test * */
+    public function it_should_disallow_minting_of_url_not_in_top_domain()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $result = $service->mint(
+            "https://google.com/", $this->getTestXML()
+        );
+        $this->assertFalse($result);
+
+        $response = $service->getResponse();
+        $formatter = new XMLFormatter();
+        $message = $formatter->format($response);
+        $sxml = new SimpleXMLElement($message);
+
+        $this->assertEquals("MT014", (string)$sxml->responsecode);
+        $this->assertEquals("failure", (string)$sxml->attributes()->type);
+    }
+>>>>>>> 6efdd1f94e6814fab54161f6c97a70014bf64eae
 
         $response = $service->getResponse();
 
@@ -98,7 +138,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      */
     private function getTestXML()
     {
-        return file_get_contents(__DIR__."/sample.xml");
+        return file_get_contents(__DIR__ . "/sample.xml");
     }
 
 
@@ -133,7 +173,8 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      *
      * @return DOIServiceProvider
      */
-    private function getServiceProvider() {
+    private function getServiceProvider()
+    {
         $dotenv = new Dotenv('./');
         $dotenv->load();
         $clientRepository = new ClientRepository(

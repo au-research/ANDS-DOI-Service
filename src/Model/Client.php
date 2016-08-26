@@ -19,4 +19,14 @@ class Client extends Model
      * @var string
      */
     protected $primaryKey = "client_id";
+
+    /**
+     * Returns all the domain owned by this client
+     */
+    public function domains()
+    {
+        return $this->hasMany(
+            ClientDomain::class, "client_id", "client_id"
+        );
+    }
 }
