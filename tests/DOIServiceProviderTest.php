@@ -58,9 +58,11 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint(
             "https://devl.ands.org.au/minh/", $this->getTestXML()
         );
+
         $this->assertTrue($result);
 
         $response = $service->getResponse();
+
         $this->assertEquals("MT001", $response['responsecode']);
 
         // test formater as well
@@ -72,7 +74,22 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response['doi'], (string) $sxml->doi);
     }
 
+    /** @test **/
+    public function it_should_not_allow_minting_a_new_doi_and_return_error_message()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
 
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getInvalidTestXML()
+        );
+
+        $this->assertFalse($result);
+
+        $response = $service->getResponse();
+
+        $this->assertEquals("MT006", $response['responsecode']);
+    }
 
     /**
      * Helper method for getting the sample XML for testing purpose
@@ -83,6 +100,18 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         return file_get_contents(__DIR__."/sample.xml");
     }
+
+
+    /**
+     * Helper method for getting the sample XML for testing purpose
+     *
+     * @return string
+     */
+    private function getInvalidTestXML()
+    {
+        return file_get_contents(__DIR__."/sample_invalid.xml");
+    }
+
 
 
     /**

@@ -6,14 +6,45 @@ namespace ANDS\DOI\Validator;
 
 class XMLValidator
 {
+
+    private $validationMessage;
+
     /**
-     * determines datacite xml schema version
+     * validates datacite xml against required schema version
      *
      * @param $xml
      * @return string
      */
 
-    public function getSchemaVersion($xml){
+    public function validateSchemaVersion($xml){
+
+        $dataciteSchemaURL =  getenv('DATACITE_SCHEMA_URL');
+
+        $theSchema  = self::getSchemaVersion($xml);
+
+        $doiXML = new \DOMDocument();
+        $doiXML->loadXML($xml);
+        libxml_use_internal_errors(true);
+        $result = $doiXML->schemaValidate($dataciteSchemaURL.$theSchema);
+
+        foreach (libxml_get_errors() as $error) {
+            $this->validationMessage = $error->message;
+        }
+
+        return $result;
+
+    }
+
+
+
+    /**
+     * determines datacite xml schema version xsd
+     *
+     * @param $xml
+     * @return string
+     */
+
+    public static function getSchemaVersion($xml){
 
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
@@ -24,44 +55,14 @@ class XMLValidator
         {
             if(isset($resources->item(0)->attributes->item(0)->name))
             {
-                $theSchema  = self::getXmlSchema($resources->item(0)->attributes->item(0)->nodeValue);
+                $theSchema  = substr($resources->item(0)->attributes->item(0)->nodeValue,strpos($resources->item(0)->attributes->item(0)->nodeValue,"/meta/kernel")+5);
             }
         }
+
         return $theSchema;
 
     }
 
-
-    /**
-     * Helper function to determine version number from xml resource string
-     *
-     * @param $theSchemaLocation
-     * @return string
-     */
-
-    public static function getXmlSchema($theSchemaLocation)
-    {
-        if(str_replace("kernel-2.0","",$theSchemaLocation)!=$theSchemaLocation)
-        {
-            return "2.0";
-        }
-        elseif(str_replace("kernel-2.1","",$theSchemaLocation)!=$theSchemaLocation)
-        {
-            return "2.1";
-        }
-        elseif(str_replace("kernel-2.2","",$theSchemaLocation)!=$theSchemaLocation)
-        {
-            return "2.2";
-        }
-        elseif(str_replace("kernel-3","",$theSchemaLocation)!=$theSchemaLocation)
-        {
-            return "3";
-        }
-        else
-        {
-            return "unknown";
-        }
-    }
 
     /**
      * Replaces the DOI Identifier value in the provided XML
@@ -97,5 +98,13 @@ class XMLValidator
             );
 
         return $doiXML->saveXML();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValidationMessage()
+    {
+        return $this->validationMessage;
     }
 }

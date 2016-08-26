@@ -98,10 +98,15 @@ class DOIServiceProvider
             return false;
         }
 
+
+
         // @todo validate url, url domain
         $this->setResponse('url', $url);
 
-        // @todo validate xml, xml schema
+        if($this->validateXML($xml) === false){
+            $this->setResponse('responsecode', 'MT006');
+            return false;
+        }
 
         // construct DOI
         $doiValue = $this->getNewDOI();
@@ -115,13 +120,26 @@ class DOIServiceProvider
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
+
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
         } else {
             $this->setResponse('responsecode', 'MT005');
         }
 
+
         return $result;
+    }
+
+    private function validateXML($xml)
+    {
+        $xmlValidator = new XMLValidator();
+        $result = $xmlValidator->validateSchemaVersion($xml);
+        if ($result === false) {
+            $this->setResponse("verbosemessage", $xmlValidator->getValidationMessage());
+            return false;
+        }
+        return true;
     }
 
     /**
