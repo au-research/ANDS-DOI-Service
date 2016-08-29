@@ -3,7 +3,9 @@
 use ANDS\DOI\DOIServiceProvider;
 use ANDS\DOI\Formatter\XMLFormatter;
 use ANDS\DOI\Model\Client;
+use ANDS\DOI\Model\Doi;
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\XMLValidator;
 use Dotenv\Dotenv;
 
@@ -132,6 +134,14 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /** @test * */
+    public function it_should_activate_an_inactive_doi()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $this->assertTrue($service->activate('10.5072/00/53ED646B7A9A6'));
+
+    }
     /**
      * Helper method for getting the sample XML for testing purpose
      *
@@ -185,6 +195,13 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         );
 
+        $doiRepository = new DoiRepository(
+            getenv("DATABASE_URL"),
+            'dbs_dois',
+            getenv("DATABASE_USERNAME"),
+            getenv("DATABASE_PASSWORD")
+        );
+
         $dataciteClient = new \ANDS\DOI\DataCiteClient(
             getenv("DATACITE_USERNAME"),
             getenv("DATACITE_PASSWORD")
@@ -192,7 +209,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $dataciteClient->setDataciteUrl(getenv("DATACITE_URL"));
 
         $serviceProvider = new DOIServiceProvider(
-            $clientRepository, $dataciteClient
+            $clientRepository, $doiRepository, $dataciteClient
         );
 
         return $serviceProvider;

@@ -3,6 +3,7 @@
 namespace ANDS\DOI;
 
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\URLValidator;
 use ANDS\DOI\Validator\XMLValidator;
 
@@ -17,6 +18,7 @@ class DOIServiceProvider
 {
 
     private $clientRepo = null;
+    private $doiRepo = null;
     private $dataciteClient = null;
     private $authenticatedClient = null;
     private $response = null;
@@ -28,9 +30,11 @@ class DOIServiceProvider
      */
     public function __construct(
         ClientRepository $clientRespository,
+        DoiRepository $doiRespository,
         DataCiteClient $dataciteClient
     ) {
         $this->clientRepo = $clientRespository;
+        $this->doiRepo = $doiRespository;
         $this->dataciteClient = $dataciteClient;
     }
 
@@ -99,12 +103,7 @@ class DOIServiceProvider
             return false;
         }
 
-
-
-
-
         // Validate URL and URL Domain
-
         $this->setResponse('url', $url);
         $validDomain = URLValidator::validDomains(
             $url, $this->getAuthenticatedClient()->domains
@@ -114,6 +113,7 @@ class DOIServiceProvider
             return false;
         }
 
+        // Validate xml
         if($this->validateXML($xml) === false){
             $this->setResponse('responsecode', 'MT006');
             return false;
@@ -134,7 +134,6 @@ class DOIServiceProvider
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
-
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
             // @todo set the DOI created earlier status to ACTIVE
@@ -142,10 +141,14 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT005');
         }
 
-
         return $result;
     }
 
+    /**
+     * Returns true if xml is datacite valid else false and sets error
+     *
+     * @return boolean
+     */
     private function validateXML($xml)
     {
         $xmlValidator = new XMLValidator();
@@ -185,9 +188,41 @@ class DOIServiceProvider
         // @todo
     }
 
-    public function activate()
+    public function activate($doiValue)
     {
-        // @todo
+        // validate client
+        // @todo event handler, message
+        if (!$this->isClientAuthenticated()) {
+            $this->setResponse('responsecode', 'MT009');
+            return false;
+        }
+
+        // @todo - check if this client owns this doi
+
+        //get the doi info
+        $doi = $this->doiRepo->getByID($doiValue);
+
+        $doi_xml = $doi->datacite_xml;
+
+
+        //check if  inactive
+        if($doi->status!='INACTIVE')
+        {
+            $this->setResponse('responsecode', 'MT010');
+            $this->setResponse('verbosemessage', 'DOI '.$doiValue." not set to INACTIVE so cannot activate it");
+            return false;
+        }
+
+        // activate using dataciteClient update method;
+        $result = $this->dataciteClient->update($doi_xml);
+
+        if ($result === true) {
+            $this->setResponse('responsecode', 'MT004');
+        } else {
+            $this->setResponse('responsecode', 'MT010');
+        }
+
+        return $result;
     }
 
     public function deactivate()

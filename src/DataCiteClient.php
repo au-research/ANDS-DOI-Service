@@ -69,12 +69,14 @@ class DataCiteClient
      */
     public function update($xmlBody = false)
     {
-        return $this->request($this->dataciteUrl . 'metadata/', $xmlBody);
+        $this->request($this->dataciteUrl . 'metadata/', $xmlBody);
+        return $this->hasError() ? false : true;
     }
 
-    public function activate()
+    ///Don't have an activate function...updating the xml activates a deactivated doi...
+    public function activate($xmlBody = false)
     {
-
+        return $this->request($this->dataciteUrl . 'metadata/', $xmlBody);
     }
 
     public function deActivate($doiId)
