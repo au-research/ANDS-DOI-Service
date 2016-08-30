@@ -153,6 +153,15 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test * */
+    public function it_should_deactivate_an_active_doi()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $this->assertTrue($service->deactivate('10.5072/00/57BB9A544C048'));
+
+    }
+
+    /** @test * */
     public function it_should_allow_current_client_doi_access()
     {
         $service = $this->getServiceProvider();

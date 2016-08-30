@@ -236,9 +236,7 @@ class DOIServiceProvider
         if ($result === true) {
             $this->setResponse('responsecode', 'MT004');
             //update the database DOIRepository
-
             $this->doiRepo->doiUpdate($doi, array('status'=>'ACTIVE'));
-            //@todo update DOI to the database it should be ACTIVE
         } else {
             $this->setResponse('responsecode', 'MT010');
         }
@@ -246,9 +244,49 @@ class DOIServiceProvider
         return $result;
     }
 
-    public function deactivate()
+    public function deactivate($doiValue)
     {
-        // @todo
+
+        // validate client
+        // @todo event handler, message
+        if (!$this->isClientAuthenticated()) {
+            $this->setResponse('responsecode', 'MT009');
+            return false;
+        }
+
+        // check if this client owns this doi
+
+        if(!$this->isDoiAuthenticatedClients($doiValue)){
+            $this->setResponse('responsecode', 'MT0010');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
+        }
+
+        //get the doi info
+        $doi = $this->doiRepo->getByID($doiValue);
+
+        $doi_xml = $doi->datacite_xml;
+
+        //check if the doi is inactive
+        if($doi->status!='ACTIVE')
+        {
+            $this->setResponse('responsecode', 'MT010');
+            $this->setResponse('verbosemessage', 'DOI '.$doiValue." not set to ACTIVE so cannot deactivate it");
+            return false;
+        }
+
+        $result = $this->dataciteClient->deActivate($doi_xml);
+
+        if ($result === true) {
+            $this->setResponse('responsecode', 'MT004');
+            //update the database DOIRepository
+            $this->doiRepo->doiUpdate($doi, array('status'=>'INACTIVE'));
+        } else {
+            $this->setResponse('responsecode', 'MT010');
+        }
+
+        return $result;
+
     }
 
     public function setResponse($key, $value)

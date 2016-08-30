@@ -81,8 +81,10 @@ class DataCiteClient
 
     public function deActivate($doiId)
     {
-        return $this->request($this->dataciteUrl . 'metadata/' . $doiId, false,
+       $this->request($this->dataciteUrl . 'metadata/' . $doiId, false,
             "DELETE");
+
+        return $this->hasError() ? false : true;
     }
 
     /**
