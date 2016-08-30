@@ -135,13 +135,41 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test * */
+    public function it_should_not_activate_an_active_doi()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $this->assertFalse($service->activate('10.5072/00/53ED646B7A9A6'));
+
+    }
+
+    /** @test * */
     public function it_should_activate_an_inactive_doi()
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->activate('10.5072/00/53ED646B7A9A6'));
+        $this->assertTrue($service->activate('10.5072/00/57BB9A544C048'));
 
     }
+
+    /** @test * */
+    public function it_should_allow_current_client_doi_access()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $this->assertTrue($service->isDoiAuthenticatedClients('10.5072/00/53ED646B7A9A6'));
+
+    }
+
+    /** @test * */
+    public function it_should_not_allow_current_client_doi_access()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $this->assertFalse($service->isDoiAuthenticatedClients('10.5072/11/53ED646B7A9A6'));
+
+    }
+
     /**
      * Helper method for getting the sample XML for testing purpose
      *

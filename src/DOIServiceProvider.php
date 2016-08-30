@@ -94,6 +94,18 @@ class DOIServiceProvider
         return $this->getAuthenticatedClient() === null ? false : true;
     }
 
+    /**
+     * Returns if a client is authenticated
+     *
+     * @param $doiValue
+     * @return bool
+     */
+    public function isDoiAuthenticatedClients($doiValue)
+    {
+        $clientPrefix=$this->getAuthenticatedClient()->datacite_prefix.str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
+        return (strpos($doiValue,$clientPrefix)===0);
+    }
+
 
     public function mint($url, $xml)
     {
@@ -197,15 +209,20 @@ class DOIServiceProvider
             return false;
         }
 
-        // @todo - check if this client owns this doi
+        // check if this client owns this doi
+
+        if(!$this->isDoiAuthenticatedClients($doiValue)){
+            $this->setResponse('responsecode', 'MT0010');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
+        }
 
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
 
         $doi_xml = $doi->datacite_xml;
 
-
-        //check if  inactive
+        //check if the doi is inactive
         if($doi->status!='INACTIVE')
         {
             $this->setResponse('responsecode', 'MT010');
@@ -218,6 +235,8 @@ class DOIServiceProvider
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT004');
+            //update the database DOIRepository
+            //@todo update DOI to the database it should be ACTIVE
         } else {
             $this->setResponse('responsecode', 'MT010');
         }
