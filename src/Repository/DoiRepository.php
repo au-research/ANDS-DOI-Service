@@ -19,6 +19,13 @@ class DoiRepository
         return Doi::find($id);
     }
 
+    public function doiUpdate($doi, $attributes)
+    {
+        foreach($attributes as $key=>$value){
+            $doi->$key = $value;
+        }
+        $doi->save();
+    }
 
     /**
      * DoiRespository constructor.

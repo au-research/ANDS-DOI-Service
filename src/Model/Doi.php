@@ -23,5 +23,6 @@ class Doi extends Model
     protected $casts = [
         'doi_id' => 'string',
     ];
-
+    const CREATED_AT = 'updated_when';
+    const UPDATED_AT = 'created_when';
 }

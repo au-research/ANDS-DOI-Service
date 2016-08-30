@@ -236,6 +236,8 @@ class DOIServiceProvider
         if ($result === true) {
             $this->setResponse('responsecode', 'MT004');
             //update the database DOIRepository
+
+            $this->doiRepo->doiUpdate($doi, array('status'=>'ACTIVE'));
             //@todo update DOI to the database it should be ACTIVE
         } else {
             $this->setResponse('responsecode', 'MT010');
