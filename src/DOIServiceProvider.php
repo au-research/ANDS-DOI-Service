@@ -195,7 +195,7 @@ class DOIServiceProvider
 
 
 
-    public function update()
+    public function update($url, $xml)
     {
         // @todo
     }
