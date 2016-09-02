@@ -27,6 +27,15 @@ class DoiRepository
         $doi->save();
     }
 
+    public function doiCreate($attributes)
+    {
+
+        $doi = new Doi;
+        foreach($attributes as $key=>$value){
+            $doi->$key = $value;
+        }
+        $doi->save();
+    }
     /**
      * DoiRespository constructor.
      * @param $databaseURL

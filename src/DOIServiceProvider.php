@@ -141,14 +141,15 @@ class DOIServiceProvider
         $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
 
         //update the database DOIRepository
-        //@todo add a DOI to the database it should be REQUESTED
+
+        $doi = $this->insertNewDoi($doiValue,$xml,$url);
 
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
-            // @todo set the DOI created earlier status to ACTIVE
+            $this->doiRepo->doiUpdate($doi, array('status'=>'ACTIVE'));
         } else {
             $this->setResponse('responsecode', 'MT005');
         }
@@ -193,11 +194,63 @@ class DOIServiceProvider
         return $prefix . $client_id . $doiValue;
     }
 
+    private function insertNewDOI($doiValue,$xml,$url){
+        $doiXML = new \DOMDocument();
+        $doiXML->loadXML($xml);
+        $doiattributes = array();
 
+        $publisher = $doiXML->getElementsByTagName('publisher');
+        $publication_year = $doiXML->getElementsByTagName('publicationYear');
+        $doiattributes['doi_id'] = $doiValue;
+        $doiattributes['publisher'] = $publisher->item(0)->nodeValue;
+        $doiattributes['publication_year'] = $publication_year->item(0)->nodeValue;
+        $doiattributes['status'] = 'REQUESTED';
+        $doiattributes['url'] = $url;
+        $doiattributes['identifier_type'] = 'DOI';
+        $doiattributes['client_id'] = $this->getAuthenticatedClient()->client_id;
+        $doiattributes['created_who'] = 'SYSTEM';
+        $doiattributes['datacite_xml'] = $xml;
 
-    public function update($url, $xml)
+        $this->doiRepo->doiCreate($doiattributes);
+
+        $doi = $this->doiRepo->getByID($doiValue);
+
+        return $doi;
+
+    }
+
+    public function update($doiValue, $url=NULL, $xml=NULL)
     {
         // @todo
+
+        // validate client
+        // @todo event handler, message
+        if (!$this->isClientAuthenticated()) {
+            return false;
+        }
+
+        // Validate URL and URL Domain
+        if (isset($url)) {
+            $this->setResponse('url', $url);
+            $validDomain = URLValidator::validDomains(
+                $url, $this->getAuthenticatedClient()->domains
+            );
+            if (!$validDomain) {
+                $this->setResponse("responsecode", "MT014");
+                return false;
+            }
+            $result = $this->dataciteClient->mint($doiValue, $url);
+        }
+
+        if(isset($xml)) {
+            // Validate xml
+            if ($this->validateXML($xml) === false) {
+                $this->setResponse('responsecode', 'MT006');
+                return false;
+            }
+            $result = $this->dataciteClient->update($xml);
+        }
+
     }
 
     public function activate($doiValue)
@@ -299,4 +352,6 @@ class DOIServiceProvider
     {
         return $this->response;
     }
+
+
 }
