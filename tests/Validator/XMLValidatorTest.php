@@ -1,6 +1,7 @@
 <?php
 
 use ANDS\DOI\Validator\XMLValidator;
+use Dotenv\Dotenv;
 
 class XMLValidatorTest extends PHPUnit_Framework_TestCase
 {
@@ -15,15 +16,21 @@ class XMLValidatorTest extends PHPUnit_Framework_TestCase
     public function it_should_return_xml_schema_validation()
     {
         $xml = file_get_contents(__DIR__."/.."."/sample.xml");
-        $this->assertTrue(XMLValidator::validateSchemaVersion($xml));
+        $this->assertTrue(XMLValidator::create()->validateSchemaVersion($xml));
     }
 
     /** @test **/
     public function it_should_return_xml_schema_invalid()
     {
         $xml = file_get_contents(__DIR__."/.."."/sample_invalid.xml");
-        $invalid = XMLValidator::validateSchemaVersion($xml);
+        $invalid = XMLValidator::create()->validateSchemaVersion($xml);
         $this->assertFalse($invalid);
+    }
+
+    public function setUp()
+    {
+        $dotenv = new Dotenv('./');
+        $dotenv->load();
     }
 
 }

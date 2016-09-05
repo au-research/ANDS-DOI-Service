@@ -16,16 +16,17 @@ class XMLValidator
      * @return string
      */
 
-    public function validateSchemaVersion($xml){
+    public function validateSchemaVersion($xml)
+    {
 
-        $dataciteSchemaURL =  getenv('DATACITE_SCHEMA_URL');
+        $dataciteSchemaURL = getenv('DATACITE_SCHEMA_URL');
 
-        $theSchema  = self::getSchemaVersion($xml);
+        $theSchema = self::getSchemaVersion($xml);
 
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
         libxml_use_internal_errors(true);
-        $result = $doiXML->schemaValidate($dataciteSchemaURL.$theSchema);
+        $result = $doiXML->schemaValidate($dataciteSchemaURL . $theSchema);
 
         foreach (libxml_get_errors() as $error) {
             $this->validationMessage = $error->message;
@@ -35,6 +36,17 @@ class XMLValidator
 
     }
 
+    /**
+     * Returns a new instance of the class, to be able to use validationMessage
+     * Mainly use when call validateSchemaVersion statically
+     *
+     * @usage XMLValidator::create()->validateSchemaVersion($xml)
+     * @return static
+     */
+    public static function create()
+    {
+        return new static;
+    }
 
 
     /**
@@ -44,18 +56,19 @@ class XMLValidator
      * @return string
      */
 
-    public static function getSchemaVersion($xml){
+    public static function getSchemaVersion($xml)
+    {
 
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
 
         $resources = $doiXML->getElementsByTagName('resource');
         $theSchema = 'unknown';
-        if($resources->length>0)
-        {
-            if(isset($resources->item(0)->attributes->item(0)->name))
-            {
-                $theSchema  = substr($resources->item(0)->attributes->item(0)->nodeValue,strpos($resources->item(0)->attributes->item(0)->nodeValue,"/meta/kernel")+5);
+        if ($resources->length > 0) {
+            if (isset($resources->item(0)->attributes->item(0)->name)) {
+                $theSchema = substr($resources->item(0)->attributes->item(0)->nodeValue,
+                    strpos($resources->item(0)->attributes->item(0)->nodeValue,
+                        "/meta/kernel") + 5);
             }
         }
 
