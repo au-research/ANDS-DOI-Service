@@ -229,6 +229,13 @@ class DOIServiceProvider
             return false;
         }
 
+        // check if this client owns this doi
+        if(!$this->isDoiAuthenticatedClients($doiValue)){
+            $this->setResponse('responsecode', 'MT0010');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
+        }
+
         // Validate URL and URL Domain
         if (isset($url)) {
             $this->setResponse('url', $url);
@@ -239,7 +246,14 @@ class DOIServiceProvider
                 $this->setResponse("responsecode", "MT014");
                 return false;
             }
-            $result = $this->dataciteClient->mint($doiValue, $url);
+            $result = $this->dataciteClient->updateURL($doiValue, $url);
+            if ($result === true) {
+                $this->setResponse('responsecode', 'MT002');
+                //update the database DOIRepository
+                $this->doiRepo->doiUpdate($doi, array('url'=>$url));
+            } else {
+                $this->setResponse('responsecode', 'MT010');
+            }
         }
 
         if(isset($xml)) {
@@ -249,6 +263,13 @@ class DOIServiceProvider
                 return false;
             }
             $result = $this->dataciteClient->update($xml);
+            if ($result === true) {
+                $this->setResponse('responsecode', 'MT002');
+                //update the database DOIRepository
+                $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml));
+            } else {
+                $this->setResponse('responsecode', 'MT010');
+            }
         }
 
     }

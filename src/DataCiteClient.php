@@ -73,6 +73,20 @@ class DataCiteClient
         return $this->hasError() ? false : true;
     }
 
+    /**
+     * UpdateURL
+     * @param string $doiUrl, string $doiId
+     * @return bool
+     */
+
+    public function updateURL($doiId,$doiUrl)
+    {
+        $this->request($this->dataciteUrl . 'doi/',
+            "doi=" . $doiId . "\nurl=" . $doiUrl);
+        return $this->hasError() ? false : true;
+    }
+
+
     ///Don't have an activate function...updating the xml activates a deactivated doi...
     public function activate($xmlBody = false)
     {
@@ -120,8 +134,6 @@ class DataCiteClient
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt($ch, CURLOPT_VERBOSE, true);
-        // curl_setopt($ch, CURLOPT_HEADER, true);
 
         curl_setopt($ch, CURLOPT_USERPWD,
             $this->username . ":" . $this->password);

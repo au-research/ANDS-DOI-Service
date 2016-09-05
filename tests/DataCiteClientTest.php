@@ -58,9 +58,9 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
     public function it_should_set_datacite_url()
     {
         $client = $this->getClient();
-        $client->setDataciteUrl('https://mds.datacite.org/');
+        $client->setDataciteUrl('https://mds.test.datacite.org/');
         $this->assertEquals(
-            $client->getDataciteUrl(), 'https://mds.datacite.org/'
+            $client->getDataciteUrl(), 'https://mds.test.datacite.org/'
         );
     }
 
@@ -69,7 +69,45 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
     {
         //run update with new xml
         //get the new xml and make sure it's the same
-        //put old xml back?
+        //put old xml back
+
+        $client = $this->getClient();
+
+        $metadata = $client->getMetadata("10.5072/00/56610ec83d432");
+
+        $replace= file_get_contents(__DIR__."/replace_sample.xml");
+
+        $client->update($replace);
+
+        $this->assertEquals($client->getMetadata("10.5072/00/56610ec83d432"),$replace);
+
+
+        //revert back to old xml
+        $client->update($metadata);
+
+
+    }
+
+    /** @test */
+    public function it_should_update_a_doi_with_new_url()
+    {
+        //run update with new url
+        //get the new url and make sure it's the same
+        //put old url back
+
+        $client = $this->getClient();
+
+        $url =  $client->get("10.5072/00/56610ec83d432");
+
+        $new_url= "https://devl.ands.org.au/minh_replaced/" ;
+
+        $client->updateURL("10.5072/00/56610ec83d432",$new_url);
+
+        $this->assertEquals($client->get("10.5072/00/56610ec83d432"), $new_url);
+
+        //revert back to old url
+        $client->updateURL("10.5072/00/56610ec83d432",$url);
+
     }
 
     /** @test */
