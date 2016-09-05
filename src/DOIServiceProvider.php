@@ -112,6 +112,7 @@ class DOIServiceProvider
         // validate client
         // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
+            $this->setResponse("responsecode", "MT009");
             return false;
         }
 
@@ -226,6 +227,7 @@ class DOIServiceProvider
         // validate client
         // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
+            $this->setResponse("responsecode", "MT009");
             return false;
         }
 
