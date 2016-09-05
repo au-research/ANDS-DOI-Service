@@ -128,7 +128,7 @@ class DataCiteClient
         curl_setopt($ch, CURLOPT_HTTPHEADER,
             array("Content-Type:application/xml;charset=UTF-8"));
 
-        if ($content) {
+        if ($content && !$customRequest) {
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
         }

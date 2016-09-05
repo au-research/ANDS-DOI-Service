@@ -148,7 +148,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->activate('10.5072/00/57BB9A544C048'));
+        $this->assertTrue($service->activate('10.5072/00/57CCB77169F6B'));
 
     }
 
@@ -157,7 +157,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->deactivate('10.5072/00/57BB9A544C048'));
+        $this->assertTrue($service->deactivate('10.5072/00/57CCB77169F6B'));
 
     }
 
