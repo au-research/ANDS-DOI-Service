@@ -13,6 +13,6 @@ class SchemaProvider
      */
     public static function getSchema($theSchema)
     {
-        return "./schema".$theSchema;
+        return __DIR__."/../schema".$theSchema;
     }
 }
