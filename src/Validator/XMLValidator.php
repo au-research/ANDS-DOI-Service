@@ -4,6 +4,8 @@
 namespace ANDS\DOI\Validator;
 
 
+use ANDS\DOI\SchemaProvider;
+
 class XMLValidator
 {
 
@@ -18,22 +20,19 @@ class XMLValidator
 
     public function validateSchemaVersion($xml)
     {
-
-        $dataciteSchemaURL = getenv('DATACITE_SCHEMA_URL');
-
         $theSchema = self::getSchemaVersion($xml);
-
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
+
         libxml_use_internal_errors(true);
-        $result = $doiXML->schemaValidate($dataciteSchemaURL . $theSchema);
+
+        $schemaPath = SchemaProvider::getSchema($theSchema);
+        $result = $doiXML->schemaValidate($schemaPath);
 
         foreach (libxml_get_errors() as $error) {
             $this->validationMessage = $error->message;
         }
-
         return $result;
-
     }
 
     /**
