@@ -49,10 +49,11 @@ class DOIServiceProvider
     public function authenticate(
         $appID,
         $sharedSecret = null,
-        $ipAddress = null
+        $ipAddress = null,
+        $manual = false
     ) {
         $client = $this->clientRepo->authenticate($appID, $sharedSecret,
-            $ipAddress);
+            $ipAddress, $manual);
 
         if ($client) {
             $this->setAuthenticatedClient($client);
