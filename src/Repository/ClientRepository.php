@@ -35,12 +35,16 @@ class ClientRepository
     public function authenticate(
         $appID,
         $sharedSecret = null,
-        $ipAddress = null
+        $ipAddress = null,
+        $manual = false
     ) {
         $client = $this->getByAppID($appID);
 
         if ($client === null) {
             return false;
+        } else if ($manual){
+
+            return $client;
         }
 
         // shared secret matching
