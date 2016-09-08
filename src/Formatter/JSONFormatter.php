@@ -2,7 +2,7 @@
 
 namespace ANDS\DOI\Formatter;
 
-class XMLFormatter extends Formatter
+class JSONFormatter extends Formatter
 {
     /**
      * Format and return the payload
@@ -15,7 +15,7 @@ class XMLFormatter extends Formatter
         $payload = $this->fill($payload);
 
         header('Content-type: application/json');
-        
+
         return json_encode($payload);
     }
 
