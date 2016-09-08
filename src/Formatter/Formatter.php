@@ -41,7 +41,7 @@ class Formatter
                 $payload['codeMessage'] = 'OK';
                 break;
             case "MT003":
-                $payload['message'] = "DOI ".$payload['doi']." was successfully inactivated.";
+                $payload['message'] = "DOI ".$payload['doi']." was successfully deactivated.";
                 $payload['type'] = "success";
                 $payload['code'] = 200;
                 $payload['codeMessage'] = 'OK';
