@@ -239,6 +239,8 @@ class DOIServiceProvider
             return false;
         }
 
+        $doi = $this->doiRepo->getByID($doiValue);
+        $this->setResponse('doi', $doiValue);
         // Validate URL and URL Domain
         if (isset($url)) {
             $this->setResponse('url', $url);
