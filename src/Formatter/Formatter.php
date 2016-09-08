@@ -12,10 +12,13 @@ class Formatter
      */
     public function fill($payload)
     {
+        $response = array();
+
         $payload = $this->determineTypeAndMessage($payload);
-        $payload = $this->fillBlanks($payload);
+        $response['response'] = $this->fillBlanks($payload);
+
         header("HTTP/1.0 ".$payload['code']. " ".$payload['codeMessage']);
-        return $payload;
+        return $response;
     }
 
     /**
