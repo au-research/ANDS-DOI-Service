@@ -14,6 +14,7 @@ class Formatter
     {
         $payload = $this->determineTypeAndMessage($payload);
         $payload = $this->fillBlanks($payload);
+        header("HTTP/1.0 ".$payload['code']. " ".$payload['codeMessage']);
         return $payload;
     }
 
@@ -26,26 +27,36 @@ class Formatter
      */
     public function determineTypeAndMessage($payload)
     {
+
         switch($payload['responsecode']) {
             case "MT001":
                 $payload['message'] = "DOI ".$payload['doi']." was successfully minted.";
                 $payload['type'] = "success";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT002":
                 $payload['message'] = "DOI ".$payload['doi']." was successfully updated.";
-                $payload['type'] = "success";
+                $payload['type'] = "success";                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT003":
                 $payload['message'] = "DOI ".$payload['doi']." was successfully inactivated.";
                 $payload['type'] = "success";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT004":
                 $payload['message'] = "DOI ".$payload['doi']." was successfully activated.";
                 $payload['type'] = "success";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT005":
                 $payload['message'] = "The ANDS Cite My Data service is currently unavailable. Please try again at a later time. If you continue to experience problems please contact services@ands.org.au.";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
             case "MT006":
                 $payload['message'] = "The metadata you have provided to mint a new DOI has failed the schema validation. 
@@ -54,6 +65,8 @@ class Formatter
 			please visit the ANDS website http://ands.org.au. 
 			Detailed information about the validation errors can be found below.";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
             case "MT007":
                 $payload['message'] = "The metadata you have provided to update DOI ".$payload['doi']." has failed the schema validation. 
@@ -62,49 +75,71 @@ class Formatter
 			please visit the ANDS website http://ands.org.au. 
 			Detailed information about the validation errors can be found below.";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
             case "MT008":
                 $payload['message'] = "You do not appear to be the owner of DOI ".$payload['doi'].". If you believe this to be incorrect please contact services@ands.org.au.";
                 $payload['type'] = "failure";
+                $payload['code'] = 415;
+                $payload['codeMessage'] = 'Authentication Error';
                 break;
             case "MT009":
                 $payload['message'] = "You are not authorised to use this service. For more information or to request access to the service please contact services@ands.org.au.";
                 $payload['type'] = "failure";
+                $payload['code'] = 415;
+                $payload['codeMessage'] = 'Authentication Error';
                 break;
             case "MT010":
                 $payload['message'] = "There has been an unexpected error processing your doi request. For more information please contact services@ands.org.au.";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
             case "MT011":
                 $payload['message'] = "DOI ".$payload['doi']." does not exist in the ANDS Cite My Data service.";
                 $payload['type'] = "failure";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT012":
                 $payload['message'] = "No metadata exists in the Cite My Data service for DOI ".$payload['doi'];
                 $payload['type'] = "failure";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT013":
                 $payload['message'] = $payload['verbosemessage'];
                 $payload['verbosemessage'] = strlen($payload['verbosemessage']) . " bytes";
                 $payload['type'] = "success";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT014":
                 $payload['message'] = "The provided URL does not belong to any of your registered top level domains. If you would like to add additional domains to your account please contact services@ands.org.au. ";
                 $payload['type'] = "failure";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT090":
                 // Success response for status pings (verbose message should indicate ms turnaround time)
                 $payload['message'] = "The rocket is ready to blast off -- all systems are go!";
                 $payload['type'] = "success";
+                $payload['code'] = 200;
+                $payload['codeMessage'] = 'OK';
                 break;
             case "MT091":
                 // Failure response for status pings
                 $payload['message'] = "Uh oh! DOI Service unavailable (unable to process upstream DOI request). Please try again in a few moments. ";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
             default:
                 $payload['message'] = "There has been an unidentified error processing your doi request. For more information please contact services@ands.org.au.";
                 $payload['type'] = "failure";
+                $payload['code'] = 500;
+                $payload['codeMessage'] = 'Internal Server Error';
                 break;
         }
 

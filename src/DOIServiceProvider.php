@@ -298,6 +298,7 @@ class DOIServiceProvider
 
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
+        $this->setResponse('doi', $doiValue);
 
         $doi_xml = $doi->datacite_xml;
 
@@ -343,6 +344,7 @@ class DOIServiceProvider
 
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
+        $this->setResponse('doi', $doiValue);
 
         //check if the doi is inactive
         if($doi->status!='ACTIVE')
@@ -355,7 +357,7 @@ class DOIServiceProvider
         $result = $this->dataciteClient->deActivate($doiValue);
 
         if ($result === true) {
-            $this->setResponse('responsecode', 'MT004');
+            $this->setResponse('responsecode', 'MT003');
             //update the database DOIRepository
             $this->doiRepo->doiUpdate($doi, array('status'=>'INACTIVE'));
         } else {
