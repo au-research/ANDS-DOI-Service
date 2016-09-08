@@ -16,7 +16,7 @@ class JSONFormatter extends Formatter
 
         header('Content-type: application/json');
 
-        return json_encode($payload);
+        return '{"response" :'.json_encode($payload).'}';
     }
 
 }
