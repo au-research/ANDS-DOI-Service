@@ -242,7 +242,7 @@ class DOIServiceProvider
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
         // Validate URL and URL Domain
-        if (isset($url)) {
+        if (isset($url) && $url!="") {
             $this->setResponse('url', $url);
             $validDomain = URLValidator::validDomains(
                 $url, $this->getAuthenticatedClient()->domains
@@ -261,10 +261,10 @@ class DOIServiceProvider
             }
         }
 
-        if(isset($xml)) {
+        if(isset($xml) && $xml!="") {
             // Validate xml
             if ($this->validateXML($xml) === false) {
-                $this->setResponse('responsecode', 'MT006');
+                $this->setResponse('responsecode', 'MT007');
                 return false;
             }
             $result = $this->dataciteClient->update($xml);
