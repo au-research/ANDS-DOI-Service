@@ -13,10 +13,9 @@ class JSONFormatter extends Formatter
     public function format($payload)
     {
         $payload = $this->fill($payload);
-
-        header('Content-type: application/json');
-
-        return '{"response" :'.json_encode($payload).'}';
+        return json_encode([
+            'response' => json_encode($payload, true)
+        ], true);
     }
 
 }

@@ -13,8 +13,6 @@ class XMLFormatter extends Formatter
     public function format($payload)
     {
         $payload = $this->fill($payload);
-
-        header('Content-type: text/xml');
         $str = "";
         $str .= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
         $str .="<response type=\"".$payload['type']."\">";

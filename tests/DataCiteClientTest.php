@@ -44,7 +44,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
     public function test_mint_a_new_doi()
     {
         $client = $this->getClient();
-        $xml = file_get_contents(__DIR__."/sample.xml");
+        $xml = file_get_contents(__DIR__ . "/assets/sample.xml");
 
         $doi = "10.5072/00/".uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
@@ -75,7 +75,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
 
         $metadata = $client->getMetadata("10.5072/00/56610ec83d432");
 
-        $replace= file_get_contents(__DIR__."/replace_sample.xml");
+        $replace= file_get_contents(__DIR__."/assets/replace_sample.xml");
 
         $client->update($replace);
 

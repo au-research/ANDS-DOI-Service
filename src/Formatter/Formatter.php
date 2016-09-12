@@ -14,7 +14,6 @@ class Formatter
     {
         $payload = $this->determineTypeAndMessage($payload);
         $payload = $this->fillBlanks($payload);
-        header("HTTP/1.0 ".$payload['code']. " ".$payload['codeMessage']);
         return $payload;
     }
 

@@ -27,6 +27,12 @@ class XMLValidator
         libxml_use_internal_errors(true);
 
         $schemaPath = SchemaProvider::getSchema($theSchema);
+
+        // if the schema is not stored locally, lookup on datacite
+        if (!is_file($schemaPath)) {
+            $schemaPath = 'http://schema.datacite.org/meta' . $theSchema;
+        }
+
         $result = $doiXML->schemaValidate($schemaPath);
 
         foreach (libxml_get_errors() as $error) {
@@ -57,7 +63,6 @@ class XMLValidator
 
     public static function getSchemaVersion($xml)
     {
-
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
 
@@ -72,7 +77,6 @@ class XMLValidator
         }
 
         return $theSchema;
-
     }
 
 

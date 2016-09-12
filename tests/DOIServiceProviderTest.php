@@ -186,7 +186,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      */
     private function getTestXML()
     {
-        return file_get_contents(__DIR__ . "/sample.xml");
+        return file_get_contents(__DIR__ . "/assets/sample.xml");
     }
 
 
@@ -197,7 +197,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      */
     private function getInvalidTestXML()
     {
-        return file_get_contents(__DIR__."/sample_invalid.xml");
+        return file_get_contents(__DIR__ . "/assets/sample_invalid.xml");
     }
 
 

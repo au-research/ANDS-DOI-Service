@@ -13,9 +13,6 @@ class StringFormatter extends Formatter
     public function format($payload)
     {
         $payload = $this->fill($payload);
-
-        header('Content-type: text/html');
-
         return "[".$payload['responsecode']."] ".$payload['message']."<br />".$payload['verbosemessage']."<br/>".$payload['url'];
 
     }
