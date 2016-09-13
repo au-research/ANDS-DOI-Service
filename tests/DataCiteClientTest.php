@@ -54,6 +54,20 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($response);
     }
 
+    /** @test **/
+    public function it_should_mint_a_schema_version_4_doi()
+    {
+        $client = $this->getClient();
+        $xml = file_get_contents(__DIR__ . "/assets/datacite-example-full-v4.0.xml");
+
+        $doi = "10.5072/00/".uniqid();
+        $xml = XMLValidator::replaceDOIValue($doi, $xml);
+        $response = $client->mint(
+            $doi, "https://devl.ands.org.au/minh/", $xml
+        );
+        $this->assertTrue($response);
+    }
+
     /** @test */
     public function it_should_set_datacite_url()
     {
