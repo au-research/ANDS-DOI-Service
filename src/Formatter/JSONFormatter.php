@@ -14,7 +14,7 @@ class JSONFormatter extends Formatter
     {
         $payload = $this->fill($payload);
         return json_encode([
-            'response' => json_encode($payload, true)
+            'response' => $payload
         ], true);
     }
 
