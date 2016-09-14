@@ -258,6 +258,8 @@ class DOIServiceProvider
                 $this->doiRepo->doiUpdate($doi, array('url'=>$url));
             } else {
                 $this->setResponse('responsecode', 'MT010');
+                $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
+                return false;
             }
         }
 
@@ -274,8 +276,12 @@ class DOIServiceProvider
                 $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml));
             } else {
                 $this->setResponse('responsecode', 'MT010');
+                $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
+                return false;
             }
         }
+
+        return true;
 
     }
 
