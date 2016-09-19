@@ -154,6 +154,7 @@ class DOIServiceProvider
             $this->doiRepo->doiUpdate($doi, array('status'=>'ACTIVE'));
         } else {
             $this->setResponse('responsecode', 'MT005');
+            $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
         }
 
         return $result;
