@@ -35,4 +35,15 @@ class URLValidatorTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertFalse(URLValidator::validDomains($domain, $domains));
     }
+
+    /** @test **/
+    public function it_should_validate_correctly_on_correct_client_domain()
+    {
+        $domain = "http://researchdata.ands.org.au/Selenium";
+        $domains = [
+            new ClientDomain(['client_domain' => 'example.com']),
+            new ClientDomain(['client_domain' => 'researchdata.ands.org.au'])
+        ];
+        $this->assertTrue(URLValidator::validDomains($domain, $domains));
+    }
 }
