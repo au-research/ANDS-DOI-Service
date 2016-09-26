@@ -126,12 +126,6 @@ class Formatter
                 break;
         }
 
-        // Add responsecode to be consistent with legacy logging
-        // TODO: remove once responsecode is used in logging instead
-        if (array_key_exists('responsecode', $payload)){
-            $payload['messagecode'] = $payload['responsecode'];
-        };
-
         return $payload;
     }
 
