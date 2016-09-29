@@ -20,7 +20,7 @@ class XMLTransformer
         $xml = new DOMDocument();
         $xml->loadXML($xmlString);
 
-        return self::transform("to_kernel-4_migration", $xml);
+        return static::transform("to_kernel-4_migration", $xml);
     }
 
     /**
@@ -44,7 +44,7 @@ class XMLTransformer
         $result = $proc->transformToXML($xml);
 
         foreach (libxml_get_errors() as $error) {
-            throw new \Exception($error->message);
+            //throw new \Exception($error->message);
         }
 
         return $result;

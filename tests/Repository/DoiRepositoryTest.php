@@ -1,6 +1,10 @@
 <?php
 
+use ANDS\DOI\DataCiteClient;
+use ANDS\DOI\DOIServiceProvider;
+use ANDS\DOI\Model\Client;
 use ANDS\DOI\Model\Doi;
+use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Repository\DoiRepository;
 use Dotenv\Dotenv;
 
@@ -17,11 +21,49 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_be_able_to_get_a_doi_via_id()
     {
+        // mint a DOI, make sure it exists in the database
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+        $this->assertTrue($result);
+
+        // get the DOI
+        $response = $service->getResponse();
+        $doiID = $response['doi'];
+
+        // check repository
         $repo = $this->getDoiRepository();
-        $doi = $repo->getByID('10.5072/00/53ED646B7A9A6');
+        $doi = $repo->getByID($doiID);
+
         $this->assertNotNull($doi);
-        $this->assertSame($doi->doi_id, '10.5072/00/53ED646B7A9A6');
+        $this->assertSame($doi->doi_id, $doiID);
         $this->assertEquals($doi->publisher, "ANDS");
+    }
+
+    /**
+     * Helper method for getting the sample XML for testing purpose
+     *
+     * @return string
+     */
+    private function getTestXML()
+    {
+        return file_get_contents(__DIR__ . "/../assets/sample.xml");
+    }
+
+    /**
+     * Helper method for getting the test DOI Client for fast authentication
+     *
+     * @return mixed
+     */
+    private function getTestClient()
+    {
+        $dotenv = new Dotenv('./');
+        $dotenv->load();
+
+        $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
+        return $client;
     }
 
 
@@ -40,5 +82,41 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         );
         return $repo;
+    }
+
+    /**
+     * Helper method to create a DOIManager for every test
+     *
+     * @return DOIServiceProvider
+     */
+    private function getServiceProvider()
+    {
+        $dotenv = new Dotenv('./');
+        $dotenv->load();
+        $clientRepository = new ClientRepository(
+            getenv("DATABASE_URL"),
+            'dbs_dois',
+            getenv("DATABASE_USERNAME"),
+            getenv("DATABASE_PASSWORD")
+        );
+
+        $doiRepository = new DoiRepository(
+            getenv("DATABASE_URL"),
+            'dbs_dois',
+            getenv("DATABASE_USERNAME"),
+            getenv("DATABASE_PASSWORD")
+        );
+
+        $dataciteClient = new DataCiteClient(
+            getenv("DATACITE_USERNAME"),
+            getenv("DATACITE_PASSWORD")
+        );
+        $dataciteClient->setDataciteUrl(getenv("DATACITE_URL"));
+
+        $serviceProvider = new DOIServiceProvider(
+            $clientRepository, $doiRepository, $dataciteClient
+        );
+
+        return $serviceProvider;
     }
 }

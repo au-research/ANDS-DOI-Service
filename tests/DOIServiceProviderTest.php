@@ -8,6 +8,7 @@ use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\XMLValidator;
 use Dotenv\Dotenv;
+use ANDS\DOI\DataCiteClient;
 
 class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 {
@@ -139,8 +140,17 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertFalse($service->activate('10.5072/00/53ED646B7A9A6'));
 
+        //mint a DOI and make sure it's activated
+        $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+
+        $response = $service->getResponse();
+        $doi = $response['doi'];
+
+        // activate the already activated DOI
+        $this->assertFalse($service->activate($doi));
     }
 
     /** @test * */
@@ -148,7 +158,23 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->activate('10.5072/00/57CCB77169F6B'));
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+        $this->assertTrue($result);
+
+        $response = $service->getResponse();
+
+        $doi = $response['doi'];
+
+        // deactivate it
+        $result = $service->deactivate($doi);
+        $this->assertTrue($result);
+
+        // this DOI should now be activated
+        $this->assertTrue($service->activate($doi));
 
     }
 
@@ -157,7 +183,18 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->deactivate('10.5072/00/57CCB77169F6B'));
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+        $this->assertTrue($result);
+
+        $response = $service->getResponse();
+
+        $doi = $response['doi'];
+
+        $this->assertTrue($service->deactivate($doi));
 
     }
 
