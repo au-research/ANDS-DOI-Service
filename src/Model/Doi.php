@@ -23,6 +23,22 @@ class Doi extends Model
     protected $casts = [
         'doi_id' => 'string',
     ];
-    const CREATED_AT = 'updated_when';
-    const UPDATED_AT = 'created_when';
+
+    /**
+     * Overload the save function
+     * Update the updated_when timestamp
+     *
+     * @param array $options
+     * @return bool|void
+     */
+    public function save(array $options = []) {
+        $this->updated_when = date("Y-m-d H:i:s");
+        return parent::save();
+    }
+
+    // don't use eloquent timestamp in favor of MySQL timestamps
+    //    const CREATED_AT = 'updated_when';
+    //    const UPDATED_AT = 'created_when';
+
+    public $timestamps = false;
 }

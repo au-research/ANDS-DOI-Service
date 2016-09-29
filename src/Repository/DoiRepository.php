@@ -7,35 +7,49 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class DoiRepository
 {
-
-
+    /**
+     * @return mixed
+     */
     public function getFirst()
     {
         return Doi::first();
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getByID($id)
     {
         return Doi::find($id);
     }
 
+    /**
+     * @param $doi
+     * @param $attributes
+     */
     public function doiUpdate($doi, $attributes)
     {
-        foreach($attributes as $key=>$value){
+        foreach ($attributes as $key => $value) {
             $doi->$key = $value;
         }
         $doi->save();
     }
 
+    /**
+     * @param $attributes
+     * @return bool
+     */
     public function doiCreate($attributes)
     {
-
         $doi = new Doi;
-        foreach($attributes as $key=>$value){
+        foreach ($attributes as $key => $value) {
             $doi->$key = $value;
         }
         $doi->save();
+        return true;
     }
+
     /**
      * DoiRespository constructor.
      * @param $databaseURL

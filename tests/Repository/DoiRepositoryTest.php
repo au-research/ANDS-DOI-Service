@@ -42,6 +42,41 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($doi->publisher, "ANDS");
     }
 
+    /** @test **/
+    public function it_should_create_and_update_doi_correctly()
+    {
+        $repo = $this->getDoiRepository();
+
+        $doiID = '10.5072/00/AutomatedTest'.uniqid();
+        $doi = $repo->doiCreate([
+            'doi_id' => $doiID,
+            'publisher' => 'ANDS',
+            'publication_year' => 2016,
+            'status' => 'REQUESTED',
+            'identifier_type' => 'DOI',
+            'created_who' => 'SYSTEM',
+            'url' => 'http://devl.ands.org.au/minh'
+        ]);
+
+        $this->assertTrue($doi);
+
+        // update it
+        $doi = $repo->getByID($doiID);
+        $repo->doiUpdate($doi, ['url' => 'http://devl.ands.org.au/minh2']);
+
+        // check that it's updated
+        $doi = $repo->getByID($doiID);
+        $this->assertEquals($doi->url, 'http://devl.ands.org.au/minh2');
+
+        // delete the DOI
+        $doi = $repo->getByID($doiID);
+        $doi->delete();
+
+        // assert it's gone
+        $doi = $repo->getByID($doiID);
+        $this->assertNull($doi);
+    }
+
     /**
      * Helper method for getting the sample XML for testing purpose
      *
