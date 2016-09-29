@@ -9,6 +9,8 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 class ClientRepository
 {
 
+    private $message = null;
+
     public function getFirst()
     {
         return Client::first();
@@ -30,6 +32,7 @@ class ClientRepository
      * @param $appID
      * @param null $sharedSecret
      * @param null $ipAddress
+     * @param bool $manual
      * @return bool
      */
     public function authenticate(
@@ -40,28 +43,34 @@ class ClientRepository
     ) {
         $client = $this->getByAppID($appID);
 
+        // No Client Exists
         if ($client === null) {
+            $this->setMessage("Client does not exists");
             return false;
-        } else if ($manual){
+        }
 
+        // Client exists and it's a manual request
+        if ($manual) {
             return $client;
         }
 
         // shared secret matching
         if ($sharedSecret &&
-            $client->shared_secret === $sharedSecret
+            $client->shared_secret !== $sharedSecret
         ) {
-            return $client;
+            $this->setMessage("Authentication Failed. Mismatch shared secret provided");
+            return false;
         }
 
         // ip address matching
         if ($ipAddress &&
-            IPValidator::validate($ipAddress, $client->ip_address)
+            IPValidator::validate($ipAddress, $client->ip_address) === false
         ) {
-            return $client;
+            $this->setMessage("Authentication Failed. Mismatch IP Address. Provided IP Address: ". $ipAddress);
+            return false;
         }
 
-        return false;
+        return $client;
     }
 
     /**
@@ -94,6 +103,24 @@ class ClientRepository
         $capsule->setAsGlobal();
         $capsule->getConnection('default');
         $capsule->bootEloquent();
+    }
+
+    /**
+     * @return null
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @param null $message
+     * @return $this
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+        return $this;
     }
 
 

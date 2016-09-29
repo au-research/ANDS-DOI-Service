@@ -26,6 +26,7 @@ class DOIServiceProvider
     /**
      * DOIServiceProvider constructor.
      * @param ClientRepository $clientRespository
+     * @param DoiRepository $doiRespository
      * @param DataCiteClient $dataciteClient
      */
     public function __construct(
@@ -44,6 +45,7 @@ class DOIServiceProvider
      * @param $appID
      * @param null $sharedSecret
      * @param null $ipAddress
+     * @param bool $manual
      * @return bool
      */
     public function authenticate(
@@ -61,6 +63,8 @@ class DOIServiceProvider
         }
 
         $this->setResponse('responsecode', 'MT009');
+        $this->setResponse('verbosemessage', $this->clientRepo->getMessage());
+        $this->clientRepo->setMessage(null);
         return false;
     }
 
@@ -103,14 +107,21 @@ class DOIServiceProvider
      */
     public function isDoiAuthenticatedClients($doiValue)
     {
-        $clientPrefix=$this->getAuthenticatedClient()->datacite_prefix.str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
-        return (strpos($doiValue,$clientPrefix)===0);
+        $client = $this->getAuthenticatedClient();
+        $clientPrefix = $client->datacite_prefix . str_pad($client->client_id, 2, 0, STR_PAD_LEFT) . "/";
+        return (strpos($doiValue, $clientPrefix) === 0);
     }
 
-
+    /**
+     * Mint a new DOI
+     *
+     * @param $url
+     * @param $xml
+     * @return bool
+     */
     public function mint($url, $xml)
     {
-        // validate client
+
         // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
             $this->setResponse("responsecode", "MT009");
@@ -163,7 +174,8 @@ class DOIServiceProvider
     /**
      * Returns true if xml is datacite valid else false and sets error
      *
-     * @return boolean
+     * @param $xml
+     * @return bool
      */
     private function validateXML($xml)
     {
@@ -222,12 +234,17 @@ class DOIServiceProvider
 
     }
 
+    /**
+     * Update a DOI
+     *
+     * @param $doiValue
+     * @param null $url
+     * @param null $xml
+     * @return bool
+     */
     public function update($doiValue, $url=NULL, $xml=NULL)
     {
-        // @todo
 
-        // validate client
-        // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
             $this->setResponse("responsecode", "MT009");
             return false;
@@ -286,17 +303,21 @@ class DOIServiceProvider
 
     }
 
+    /**
+     * Activate a DOI
+     *
+     * @param $doiValue
+     * @return bool|mixed
+     */
     public function activate($doiValue)
     {
         // validate client
-        // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
             $this->setResponse('responsecode', 'MT009');
             return false;
         }
 
         // check if this client owns this doi
-
         if(!$this->isDoiAuthenticatedClients($doiValue)){
             $this->setResponse('responsecode', 'MT0010');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
@@ -310,10 +331,10 @@ class DOIServiceProvider
         $doi_xml = $doi->datacite_xml;
 
         //check if the doi is inactive
-        if($doi->status!='INACTIVE')
-        {
+        if ($doi->status != 'INACTIVE') {
             $this->setResponse('responsecode', 'MT010');
-            $this->setResponse('verbosemessage', 'DOI '.$doiValue." not set to INACTIVE so cannot activate it");
+            $this->setResponse('verbosemessage',
+                'DOI ' . $doiValue . " not set to INACTIVE so cannot activate it");
             return false;
         }
 
@@ -331,21 +352,26 @@ class DOIServiceProvider
         return $result;
     }
 
+    /**
+     * Deactivate a DOI
+     *
+     * @param $doiValue
+     * @return bool
+     */
     public function deactivate($doiValue)
     {
 
         // validate client
-        // @todo event handler, message
         if (!$this->isClientAuthenticated()) {
             $this->setResponse('responsecode', 'MT009');
             return false;
         }
 
         // check if this client owns this doi
-
-        if(!$this->isDoiAuthenticatedClients($doiValue)){
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
             $this->setResponse('responsecode', 'MT0010');
-            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            $this->setResponse('verbosemessage',
+                $doiValue . " is not owned by " . $this->getAuthenticatedClient()->client_name);
             return false;
         }
 
@@ -354,10 +380,10 @@ class DOIServiceProvider
         $this->setResponse('doi', $doiValue);
 
         //check if the doi is inactive
-        if($doi->status!='ACTIVE')
-        {
+        if ($doi->status != 'ACTIVE') {
             $this->setResponse('responsecode', 'MT010');
-            $this->setResponse('verbosemessage', 'DOI '.$doiValue." not set to ACTIVE so cannot deactivate it");
+            $this->setResponse('verbosemessage',
+                'DOI ' . $doiValue . " not set to ACTIVE so cannot deactivate it");
             return false;
         }
 
@@ -375,12 +401,20 @@ class DOIServiceProvider
 
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
     public function setResponse($key, $value)
     {
         $this->response[$key] = $value;
         return $this;
     }
 
+    /**
+     * @return null
+     */
     public function getResponse()
     {
         return $this->response;

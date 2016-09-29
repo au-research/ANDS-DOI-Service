@@ -41,6 +41,16 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($sp->isClientAuthenticated());
     }
 
+    /** @test **/
+    public function it_should_disallow_minting_if_client_is_not_authenticated()
+    {
+        $service = $this->getServiceProvider();
+        $result = $service->mint(
+            "http://devl.ands.org.au/minh/", $this->getTestXML()
+        );
+        $this->assertFalse($result);
+    }
+
     /** @test * */
     public function it_should_allow_a_client_to_mint()
     {

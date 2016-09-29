@@ -63,7 +63,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function it__does_notauthenticates_user_if_ip_match_fail()
+    public function it_does_not_authenticates_user_if_ip_match_fail()
     {
         $repo = $this->getClientRepository();
         $authenticate = $repo->authenticate(
