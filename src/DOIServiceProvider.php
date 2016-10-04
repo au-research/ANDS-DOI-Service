@@ -251,14 +251,20 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if(!$this->isDoiAuthenticatedClients($doiValue)){
-            $this->setResponse('responsecode', 'MT0010');
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
         }
 
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
+
+        if ($doi === null) {
+            $this->setResponse('responsecode', 'MT011');
+            return true;
+        }
+
         // Validate URL and URL Domain
         if (isset($url) && $url!="") {
             $this->setResponse('url', $url);
@@ -318,8 +324,8 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if(!$this->isDoiAuthenticatedClients($doiValue)){
-            $this->setResponse('responsecode', 'MT0010');
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
         }
@@ -327,6 +333,11 @@ class DOIServiceProvider
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
+
+        if ($doi === null) {
+            $this->setResponse('responsecode', 'MT011');
+            return true;
+        }
 
         $doi_xml = $doi->datacite_xml;
 
@@ -369,15 +380,19 @@ class DOIServiceProvider
 
         // check if this client owns this doi
         if (!$this->isDoiAuthenticatedClients($doiValue)) {
-            $this->setResponse('responsecode', 'MT0010');
-            $this->setResponse('verbosemessage',
-                $doiValue . " is not owned by " . $this->getAuthenticatedClient()->client_name);
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
         }
 
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
+
+        if ($doi === null) {
+            $this->setResponse('responsecode', 'MT011');
+            return true;
+        }
 
         //check if the doi is inactive
         if ($doi->status != 'ACTIVE') {
