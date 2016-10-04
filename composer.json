@@ -1,0 +1,33 @@
+{
+    "name": "au-research/ands-doi-service",
+    "type": "library",
+    "license": "Apache v2.0",
+    "authors": [
+        {
+            "name": "Minh Duc Nguyen",
+            "email": "minh.nguyen@ands.org.au"
+        }
+    ],
+    "scripts": {
+        "test": [
+            "@clearTestReports",
+            "vendor/bin/phpunit --log-junit tests/reports/junit.xml --coverage-xml tests/reports/coverage/xml --coverage-html tests/reports/coverage/html"
+        ],
+        "clearTestReports": "rm -rf tests/reports/*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ANDS\\DOI\\": "src"
+        }
+    },
+    "require" : {
+        "vlucas/phpdotenv": "^2.1",
+        "illuminate/database": "5.2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.*"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
