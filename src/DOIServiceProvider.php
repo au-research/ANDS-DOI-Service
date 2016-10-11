@@ -250,19 +250,19 @@ class DOIServiceProvider
             return false;
         }
 
-        // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
-            $this->setResponse('responsecode', 'MT008');
-            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
-            return false;
-        }
-
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
 
         if ($doi === null) {
             $this->setResponse('responsecode', 'MT011');
             return true;
+        }
+
+        // check if this client owns this doi
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
         }
 
         // Validate URL and URL Domain
@@ -323,13 +323,6 @@ class DOIServiceProvider
             return false;
         }
 
-        // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
-            $this->setResponse('responsecode', 'MT008');
-            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
-            return false;
-        }
-
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
@@ -337,6 +330,13 @@ class DOIServiceProvider
         if ($doi === null) {
             $this->setResponse('responsecode', 'MT011');
             return true;
+        }
+
+        // check if this client owns this doi
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
         }
 
         $doi_xml = $doi->datacite_xml;
@@ -378,13 +378,6 @@ class DOIServiceProvider
             return false;
         }
 
-        // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
-            $this->setResponse('responsecode', 'MT008');
-            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
-            return false;
-        }
-
         //get the doi info
         $doi = $this->doiRepo->getByID($doiValue);
         $this->setResponse('doi', $doiValue);
@@ -392,6 +385,13 @@ class DOIServiceProvider
         if ($doi === null) {
             $this->setResponse('responsecode', 'MT011');
             return true;
+        }
+
+        // check if this client owns this doi
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
+            return false;
         }
 
         //check if the doi is inactive
