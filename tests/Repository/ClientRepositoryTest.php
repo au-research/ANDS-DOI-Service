@@ -72,6 +72,17 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($authenticate);
     }
 
+    /** @test **/
+    public function it_should_authenticate_user_if_sharedsecret_match_and_ip_mismatch()
+    {
+        $repo = $this->getClientRepository();
+        $client = $repo->authenticate(
+            getenv("TEST_CLIENT_APPID"), getenv("TEST_CLIENT_SHAREDSECRET"), "130.56.111.1"
+        );
+        $this->assertInstanceOf(Client::class, $client);
+        $this->assertTrue(true);
+    }
+
     /**
      * Helper method to return a new ClientRepository for each test
      *

@@ -54,12 +54,14 @@ class ClientRepository
             return $client;
         }
 
-        // shared secret matching
-        if ($sharedSecret &&
-            $client->shared_secret !== $sharedSecret
-        ) {
-            $this->setMessage("Authentication Failed. Mismatch shared secret provided");
-            return false;
+        // if sharedSecret is provided
+        if ($sharedSecret) {
+            if ($client->shared_secret !== $sharedSecret) {
+                $this->setMessage("Authentication Failed. Mismatch shared secret provided");
+                return false;
+            }
+
+            return $client;
         }
 
         // ip address matching
