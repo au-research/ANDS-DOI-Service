@@ -209,7 +209,7 @@ class DOIServiceProvider
         return $prefix . $client_id . $doiValue;
     }
 
-    private function insertNewDOI($doiValue,$xml,$url){
+    public function insertNewDOI($doiValue,$xml,$url){
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
         $doiattributes = array();
