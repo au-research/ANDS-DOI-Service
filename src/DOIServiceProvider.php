@@ -177,7 +177,7 @@ class DOIServiceProvider
      * @param $xml
      * @return bool
      */
-    private function validateXML($xml)
+    public function validateXML($xml)
     {
         $xmlValidator = new XMLValidator();
         $result = $xmlValidator->validateSchemaVersion($xml);
