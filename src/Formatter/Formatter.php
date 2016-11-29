@@ -54,11 +54,10 @@ class Formatter
                 $payload['code'] = 500;
                 break;
             case "MT006":
-                $payload['message'] = "The metadata you have provided to mint a new DOI has failed the schema validation. 
-			Metadata is validated against the latest version of the DataCite Metadata Schema. 
-			For information about the schema and the latest version supported, 
-			please visit the ANDS website http://ands.org.au. 
-			Detailed information about the validation errors can be found below.";
+                $payload['message'] = "The metadata you have provided to mint/reserve a new DOI has failed the schema validation. 
+                Metadata is validated against the latest version of the DataCite Metadata Schema. 
+                For information about the schema and the latest version supported, please visit the ANDS website http://ands.org.au. 
+                Detailed information about the validation errors can be found below.";
                 $payload['type'] = "failure";
                 $payload['code'] = 500;
                 break;
@@ -119,6 +118,11 @@ class Formatter
                 break;
             case "MT017":
                 $payload['message'] = "The DOI ".$payload['doi']." provided to mint/reserve a DOI does not match the DOI prefix allocated to your account. For more information, please contact services@ands.org.au.";
+                $payload['type'] = "failure";
+                $payload['code'] = 200;
+                break;
+            case "MT018":
+                $payload['message'] = "No metadata exists for the requested DOI. Metadata must be registered before the DOI can be minted.";
                 $payload['type'] = "failure";
                 $payload['code'] = 200;
                 break;
