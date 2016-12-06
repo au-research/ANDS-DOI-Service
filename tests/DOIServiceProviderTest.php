@@ -226,6 +226,23 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /** @test * */
+    public function it_should_add_doi_before_validate()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_without_doi.xml")
+        );
+
+
+        $this->assertTrue($result);
+
+    }
+
     /**
      * Helper method for getting the sample XML for testing purpose
      *
@@ -235,6 +252,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         return file_get_contents(__DIR__ . "/assets/sample.xml");
     }
+
 
 
     /**

@@ -144,12 +144,6 @@ class DOIServiceProvider
             return false;
         }
 
-        // Validate xml
-        if($this->validateXML($xml) === false){
-            $this->setResponse('responsecode', 'MT006');
-            return false;
-        }
-
         // construct DOI
         $doiValue = $this->getNewDOI();
         $this->setResponse('doi', $doiValue);
@@ -158,6 +152,12 @@ class DOIServiceProvider
 
         // replaced doiValue
         $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
+
+        // Validate xml
+        if($this->validateXML($xml) === false){
+            $this->setResponse('responsecode', 'MT006');
+            return false;
+        }
 
         //update the database DOIRepository
 
@@ -183,7 +183,7 @@ class DOIServiceProvider
      * @param $xml
      * @return bool
      */
-    private function validateXML($xml)
+    public function validateXML($xml)
     {
         $xmlValidator = new XMLValidator();
         $result = $xmlValidator->validateSchemaVersion($xml);
@@ -215,7 +215,7 @@ class DOIServiceProvider
         return $prefix . $client_id . $doiValue;
     }
 
-    private function insertNewDOI($doiValue,$xml,$url){
+    public function insertNewDOI($doiValue,$xml,$url){
         $doiXML = new \DOMDocument();
         $doiXML->loadXML($xml);
         $doiattributes = array();

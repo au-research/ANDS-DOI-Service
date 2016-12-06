@@ -107,6 +107,21 @@ class Formatter
                 $payload['type'] = "failure";
                 $payload['code'] = 200;
                 break;
+            case "MT015":
+                $payload['message'] = "DOI ".$payload['doi']." was successfully reserved.";
+                $payload['type'] = "success";
+                $payload['code'] = 200;
+                break;
+            case "MT016":
+                $payload['message'] = "Reserved DOI ".$payload['doi']." was successfully minted. ";
+                $payload['type'] = "success";
+                $payload['code'] = 200;
+                break;
+            case "MT017":
+                $payload['message'] = "The DOI ".$payload['doi']." provided to mint/reserve a DOI does not match the DOI prefix allocated to your account. For more information, please contact services@ands.org.au.";
+                $payload['type'] = "failure";
+                $payload['code'] = 200;
+                break;
             case "MT090":
                 // Success response for status pings (verbose message should indicate ms turnaround time)
                 $payload['message'] = "The rocket is ready to blast off -- all systems are go!";

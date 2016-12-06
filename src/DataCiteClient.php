@@ -128,7 +128,7 @@ class DataCiteClient
      * @param bool $customRequest
      * @return mixed
      */
-    private function request($url, $content = false, $customRequest = false)
+    public function request($url, $content = false, $customRequest = false)
     {
 
         $ch = curl_init();
