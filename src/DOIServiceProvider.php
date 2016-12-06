@@ -54,14 +54,21 @@ class DOIServiceProvider
         $ipAddress = null,
         $manual = false
     ) {
+
+        // set app_id before trying to authenticate for logging and report purpose
+        $this->setResponse('app_id', $appID);
+
+        // attempt authentication
         $client = $this->clientRepo->authenticate($appID, $sharedSecret,
             $ipAddress, $manual);
 
+        // client is authenticated
         if ($client) {
             $this->setAuthenticatedClient($client);
             return true;
         }
 
+        // client is not authenticated
         $this->setResponse('responsecode', 'MT009');
         $this->setResponse('verbosemessage', $this->clientRepo->getMessage());
         $this->clientRepo->setMessage(null);
@@ -85,7 +92,6 @@ class DOIServiceProvider
     public function setAuthenticatedClient($client)
     {
         $this->authenticatedClient = $client;
-        $this->setResponse('app_id', $client->app_id);
         return $this;
     }
 

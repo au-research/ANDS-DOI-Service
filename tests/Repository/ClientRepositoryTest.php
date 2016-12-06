@@ -23,6 +23,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($client->client_name, "Testing Auto Data Centre");
     }
 
+
     /** @test **/
     public function it_should_be_able_to_get_a_client_via_appid() {
         $repo = $this->getClientRepository();
