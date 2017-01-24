@@ -28,6 +28,18 @@ class XMLValidatorTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test **/
+    public function it_should_return_xml_schema_invalid_for_empty_xml()
+    {
+        $xml = "";
+        $xmlValidator = new XMLValidator();
+        $result = $xmlValidator->validateSchemaVersion($xml);
+        $this->assertFalse($result);
+
+        $validationMessage = $xmlValidator->getValidationMessage();
+        $this->assertContains("Empty string", $validationMessage);
+    }
+
+    /** @test **/
     public function it_should_validate_schema_version_4()
     {
         $xml = file_get_contents(__DIR__.'/../assets/datacite-example-fundingReference-v.4.0.xml');
