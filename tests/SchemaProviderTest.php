@@ -11,5 +11,6 @@ class SchemaProviderTest extends PHPUnit_Framework_TestCase
         $schema = SchemaProvider::getSchema("/kernel-3/metadata.xsd");
         $this->assertNotNull($schema);
         $this->assertTrue(file_exists($schema));
+        $this->assertFalse(true);
     }
 }
