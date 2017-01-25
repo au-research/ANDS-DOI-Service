@@ -2,6 +2,7 @@
 
 namespace ANDS\DOI;
 
+use ANDS\DOI\Model\Client;
 use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\URLValidator;
@@ -69,7 +70,7 @@ class DOIServiceProvider
     }
 
     /**
-     * @return null
+     * @return Client
      */
     public function getAuthenticatedClient()
     {
@@ -155,7 +156,7 @@ class DOIServiceProvider
 
         //update the database DOIRepository
 
-        $doi = $this->insertNewDoi($doiValue,$xml,$url);
+        $doi = $this->insertNewDOI($doiValue,$xml,$url);
 
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
