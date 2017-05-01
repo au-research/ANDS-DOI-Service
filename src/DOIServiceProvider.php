@@ -206,14 +206,16 @@ class DOIServiceProvider
 
         // set to test prefix if  authenticated client is a test DOI APP ID
         if (substr($this->getAuthenticatedClient()->app_id, 0, 4) == 'TEST') {
-            $prefix = "10.5072";
+            $prefix = "10.5072/";
         }
+
+        $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
 
         $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
 
         $doiValue = uniqid();
 
-        return $prefix . $client_id . $doiValue;
+        return $prefix . $client_id . $testStr . $doiValue;
     }
 
     public function insertNewDOI($doiValue,$xml,$url){
