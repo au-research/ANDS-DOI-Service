@@ -2,6 +2,7 @@
 
 namespace ANDS\DOI;
 
+use ANDS\DOI\Model\Client;
 use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\URLValidator;
@@ -76,7 +77,7 @@ class DOIServiceProvider
     }
 
     /**
-     * @return null
+     * @return Client
      */
     public function getAuthenticatedClient()
     {
@@ -161,7 +162,7 @@ class DOIServiceProvider
 
         //update the database DOIRepository
 
-        $doi = $this->insertNewDoi($doiValue,$xml,$url);
+        $doi = $this->insertNewDOI($doiValue,$xml,$url);
 
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
@@ -205,14 +206,16 @@ class DOIServiceProvider
 
         // set to test prefix if  authenticated client is a test DOI APP ID
         if (substr($this->getAuthenticatedClient()->app_id, 0, 4) == 'TEST') {
-            $prefix = "10.5072";
+            $prefix = "10.5072/";
         }
+
+        $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
 
         $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
 
         $doiValue = uniqid();
 
-        return $prefix . $client_id . $doiValue;
+        return $prefix . $client_id . $testStr . $doiValue;
     }
 
     public function insertNewDOI($doiValue,$xml,$url){

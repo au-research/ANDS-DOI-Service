@@ -20,11 +20,16 @@ class XMLValidator
 
     public function validateSchemaVersion($xml)
     {
-        $theSchema = self::getSchemaVersion($xml);
-        $doiXML = new \DOMDocument();
-        $doiXML->loadXML($xml);
-
         libxml_use_internal_errors(true);
+
+        try {
+            $theSchema = self::getSchemaVersion($xml);
+            $doiXML = new \DOMDocument();
+            $doiXML->loadXML($xml);
+        } Catch (\Exception $e) {
+            $this->validationMessage = $e->getMessage();
+            return false;
+        }
 
         $schemaPath = SchemaProvider::getSchema($theSchema);
 

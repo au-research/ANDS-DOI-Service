@@ -1,1 +1,1 @@
-# ANDS-DOI-Service
+# ANDS Research Data DOI Service

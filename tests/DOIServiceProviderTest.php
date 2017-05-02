@@ -243,6 +243,20 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /** @test **/
+    public function it_should_add_doi_and_work_with_utf8()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_utf8.xml")
+        );
+
+        $this->assertTrue($result);
+    }
+
     /**
      * Helper method for getting the sample XML for testing purpose
      *
