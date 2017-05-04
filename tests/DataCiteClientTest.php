@@ -49,7 +49,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $doi = "10.5072/00/".uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $client->mint(
-            $doi, "https://devl.ands.org.au/minh/", $xml
+            $doi, "https://devl.ands.org.au/minh/", $xml, false
         );
         $this->assertTrue($response);
     }
@@ -63,7 +63,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $doi = "10.5072/00/".uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $client->mint(
-            $doi, "https://devl.ands.org.au/minh/", $xml
+            $doi, "https://devl.ands.org.au/minh/", $xml, false
         );
         $this->assertTrue($response);
     }

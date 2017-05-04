@@ -146,7 +146,7 @@ class DOIServiceProvider
         }
 
         // construct DOI 
-               
+
         if($manual===true){
             $doiValue = XMLValidator::getDOIValue($xml);
         }else{
