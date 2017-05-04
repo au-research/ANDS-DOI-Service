@@ -126,7 +126,7 @@ class DOIServiceProvider
      * @param $xml
      * @return bool
      */
-    public function mint($url, $xml, $manual)
+    public function mint($url, $xml, $manual = false)
     {
 
         // @todo event handler, message
