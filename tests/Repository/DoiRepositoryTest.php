@@ -112,7 +112,7 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
         $repo = new DoiRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );
@@ -130,14 +130,14 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
         $clientRepository = new ClientRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );
 
         $doiRepository = new DoiRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );
