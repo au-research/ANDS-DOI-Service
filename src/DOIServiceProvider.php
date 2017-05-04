@@ -146,10 +146,11 @@ class DOIServiceProvider
         }
 
         // construct DOI 
-        if($manual===true) { 
-            $doiValue = XMLValidator::getDOIValue($xml); 
-        }else{ 
-            $doiValue = $this->getNewDOI(); 
+               
+        if($manual===true){
+            $doiValue = XMLValidator::getDOIValue($xml);
+        }else{
+            $doiValue = $this->getNewDOI();
         }
         $this->setResponse('doi', $doiValue);
 
