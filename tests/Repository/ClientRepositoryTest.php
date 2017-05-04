@@ -94,7 +94,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
         $repo = new ClientRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );
