@@ -46,7 +46,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $result = $service->mint(
-            "http://devl.ands.org.au/minh/", $this->getTestXML()
+            "http://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
         $this->assertFalse($result);
     }
@@ -60,7 +60,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($service->isClientAuthenticated());
 
         $result = $service->mint(
-            "http://devl.ands.org.au/minh/", $this->getTestXML()
+            "http://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
         $this->assertTrue($result);
     }
@@ -72,7 +72,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $service->setAuthenticatedClient($this->getTestClient());
 
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", $this->getTestXML()
+            "https://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
 
         $this->assertTrue($result);
@@ -114,7 +114,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $service->setAuthenticatedClient($this->getTestClient());
 
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", $this->getInvalidTestXML()
+            "https://devl.ands.org.au/minh/", $this->getInvalidTestXML(),false
         );
 
         $this->assertFalse($result);
@@ -130,7 +130,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
         $result = $service->mint(
-            "https://google.com/", $this->getTestXML()
+            "https://google.com/", $this->getTestXML(),false
         );
         $this->assertFalse($result);
 
@@ -153,7 +153,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         //mint a DOI and make sure it's activated
         $service->mint(
-            "https://devl.ands.org.au/minh/", $this->getTestXML()
+            "https://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
 
         $response = $service->getResponse();
@@ -171,7 +171,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         //mint a DOI and make sure it's activated
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", $this->getTestXML()
+            "https://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
         $this->assertTrue($result);
 
@@ -196,7 +196,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         //mint a DOI and make sure it's activated
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", $this->getTestXML()
+            "https://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
         $this->assertTrue($result);
 
@@ -235,7 +235,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         //mint a DOI and make sure it's activated
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_without_doi.xml")
+            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_without_doi.xml"),false
         );
 
 
@@ -251,7 +251,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         //mint a DOI and make sure it's activated
         $result = $service->mint(
-            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_utf8.xml")
+            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_utf8.xml"),false
         );
 
         $this->assertTrue($result);
@@ -306,14 +306,14 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
         $clientRepository = new ClientRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );
 
         $doiRepository = new DoiRepository(
             getenv("DATABASE_URL"),
-            'dbs_dois',
+            getenv("DATABASE"),
             getenv("DATABASE_USERNAME"),
             getenv("DATABASE_PASSWORD")
         );

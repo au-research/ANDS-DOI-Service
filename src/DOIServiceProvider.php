@@ -126,7 +126,7 @@ class DOIServiceProvider
      * @param $xml
      * @return bool
      */
-    public function mint($url, $xml)
+    public function mint($url, $xml, $manual = false)
     {
 
         // @todo event handler, message
@@ -145,8 +145,13 @@ class DOIServiceProvider
             return false;
         }
 
-        // construct DOI
-        $doiValue = $this->getNewDOI();
+        // construct DOI 
+
+        if($manual===true){
+            $doiValue = XMLValidator::getDOIValue($xml);
+        }else{
+            $doiValue = $this->getNewDOI();
+        }
         $this->setResponse('doi', $doiValue);
 
         // validation on the DOIValue

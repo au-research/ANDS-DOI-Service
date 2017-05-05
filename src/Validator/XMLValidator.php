@@ -121,6 +121,25 @@ class XMLValidator
         return $doiXML->saveXML();
     }
 
+
+    /**
+     * Gets the DOI Identifier value in the provided XML
+     *
+     * @param $xml
+     * @return string
+     */
+
+    public static function getDOIValue($xml)
+    {
+        $doiXML = new \DOMDocument();
+        $doiXML->loadXML($xml);
+
+        // get the current identifier
+        $currentIdentifier = $doiXML->getElementsByTagName('identifier');
+
+        return $currentIdentifier->item(0)->nodeValue;
+    }
+
     /**
      * @return mixed
      */
