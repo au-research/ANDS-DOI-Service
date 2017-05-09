@@ -41,6 +41,21 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($sp->isClientAuthenticated());
     }
 
+    /** @test * */
+    public function it_should_authenticate_a_test_user()
+    {
+        $sp = $this->getServiceProvider();
+        $authenticate = $sp->authenticate(
+            "TEST".getenv("TEST_CLIENT_APPID"), getenv("TEST_CLIENT_SHAREDSECRET")
+        );
+
+        $client = $sp->getAuthenticatedClient();
+        $this->assertTrue($authenticate);
+        $this->assertNotNull($sp->getAuthenticatedClient());
+        $this->assertTrue($sp->isClientAuthenticated());
+        $this->assertEquals("10.5072/", $client['datacite_prefix']);
+    }
+
     /** @test **/
     public function it_should_disallow_minting_if_client_is_not_authenticated()
     {
