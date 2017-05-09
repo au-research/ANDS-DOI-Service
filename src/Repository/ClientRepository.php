@@ -41,6 +41,11 @@ class ClientRepository
         $ipAddress = null,
         $manual = false
     ) {
+        $test_prefix = false;
+        if(substr($appID,0,4)=="TEST") {
+            $appID = str_replace("TEST","",$appID);
+            $test_prefix = true;
+        }
         $client = $this->getByAppID($appID);
 
         // No Client Exists
@@ -53,6 +58,10 @@ class ClientRepository
         if ($manual) {
             return $client;
         }
+
+        //client exists and has been set to a test account via the app_id make sure that the test prefix is used
+
+        if($test_prefix) $client['datacite_prefix'] = "10.5072/";
 
         // if sharedSecret is provided
         if ($sharedSecret) {
