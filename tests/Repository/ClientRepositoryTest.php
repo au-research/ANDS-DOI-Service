@@ -84,13 +84,41 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(true);
     }
 
+    /** @test **/
+    public function it_should_generate_new_client_with_datacite_symbol()
+    {
+        $repo = $this->getClientRepository();
+        $client = $repo->create([
+            "client_name" => "test client"
+        ]);
+        $this->assertNotNull($client->datacite_symbol);
+    }
+
+    /** @test **/
+    public function it_should_generate_datacite_symbol_for_test_client()
+    {
+        $testID = 0;
+        $repo = $this->getClientRepository();
+        $client = $repo->getByID($testID);
+        $this->assertNotNull($client);
+
+        $client->datacite_symbol = "";
+        $client->save();
+
+        $client = $repo->getByID($testID);
+        $this->assertEquals("", $client->datacite_symbol);
+
+        $repo->generateDataciteSymbol($client);
+        $this->assertNotNull($client->datacite_symbol);
+    }
+
     /**
      * Helper method to return a new ClientRepository for each test
      *
      * @return ClientRepository
      */
     private function getClientRepository() {
-        $dotenv = new Dotenv('./');
+        $dotenv = new Dotenv(dirname(__FILE__). '/../../');
         $dotenv->load();
         $repo = new ClientRepository(
             getenv("DATABASE_URL"),
