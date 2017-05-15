@@ -92,6 +92,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
             "client_name" => "test client"
         ]);
         $this->assertNotNull($client->datacite_symbol);
+        $client->delete();
     }
 
     /** @test **/

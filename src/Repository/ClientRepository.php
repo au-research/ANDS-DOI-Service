@@ -15,10 +15,6 @@ class ClientRepository
     {
         $client = new Client;
         $client->fill($params);
-
-        // created_when is a timestamp
-        $client->created_when = time();
-
         $client->save();
 
         // update datacite_symbol
