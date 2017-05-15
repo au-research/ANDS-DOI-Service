@@ -34,7 +34,8 @@ class ClientRepository
      * ANDS.CENTRE-9
      * ANDS.CENTRE10
      * ANDS.CENTRE99
-     * ANDS.100
+     * ANDS.C100
+     * ANDS.C102
      *
      * @param Client $client
      * @return Client
@@ -44,12 +45,16 @@ class ClientRepository
         $prefix = "ANDS.";
         $id = $client->client_id;
 
+        // prefix before the
         if ($id < 100) {
             $prefix .= "CENTRE";
         }
 
         if ($id < 10) {
             $prefix .= "-";
+        } else {
+            // prefix before the ID (new form)
+            $prefix .= "C";
         }
 
         $client->datacite_symbol = $prefix.$id;
