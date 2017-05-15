@@ -27,6 +27,11 @@ class ClientRepository
         return $client;
     }
 
+    public function getAll()
+    {
+        return Client::all();
+    }
+
     /**
      * Generate a datacite symbol for the given client
      * ANDS.CENTRE-1
