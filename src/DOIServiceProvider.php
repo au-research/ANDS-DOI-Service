@@ -180,6 +180,12 @@ class DOIServiceProvider
             $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
         }
 
+        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+
+        $this->setResponse('dataCiteHTTPCode',$httpCode);
+
         return $result;
     }
 
@@ -299,6 +305,12 @@ class DOIServiceProvider
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
                 return false;
             }
+
+            $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+
+            $this->setResponse('dataCiteHTTPCode',$httpCode);
         }
 
         if(isset($xml) && $xml!="") {
@@ -317,6 +329,12 @@ class DOIServiceProvider
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
                 return false;
             }
+
+            $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+
+            $this->setResponse('dataCiteHTTPCode',$httpCode);
         }
 
         return true;
@@ -374,6 +392,12 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT010');
         }
 
+        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+
+        $this->setResponse('dataCiteHTTPCode',$httpCode);
+
         return $result;
     }
 
@@ -418,6 +442,7 @@ class DOIServiceProvider
 
         $result = $this->dataciteClient->deActivate($doiValue);
 
+
         if ($result === true) {
             $this->setResponse('responsecode', 'MT003');
             //update the database DOIRepository
@@ -425,6 +450,12 @@ class DOIServiceProvider
         } else {
             $this->setResponse('responsecode', 'MT010');
         }
+
+        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+
+        $this->setResponse('dataCiteHTTPCode',$httpCode);
 
         return $result;
 
