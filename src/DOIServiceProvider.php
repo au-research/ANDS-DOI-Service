@@ -182,9 +182,9 @@ class DOIServiceProvider
 
         $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
-        $this->setResponse('dataCiteHTTPCode',$httpCode);
+        $this->setResponse('dataCiteHTTPCode',$httpCode[1]);
 
         return $result;
     }
@@ -308,7 +308,7 @@ class DOIServiceProvider
 
             $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
             $this->setResponse('dataCiteHTTPCode',$httpCode);
         }
@@ -332,7 +332,7 @@ class DOIServiceProvider
 
             $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
             $this->setResponse('dataCiteHTTPCode',$httpCode);
         }
@@ -394,7 +394,7 @@ class DOIServiceProvider
 
         $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
         $this->setResponse('dataCiteHTTPCode',$httpCode);
 
@@ -453,7 +453,7 @@ class DOIServiceProvider
 
         $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): 'NoCodeReturned';
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
         $this->setResponse('dataCiteHTTPCode',$httpCode);
 
