@@ -176,7 +176,8 @@ class DOIServiceProvider
 
         $xmlMessage = isset($dataCiteMessages[1])? $dataCiteMessages[1]: "No message returned from DataCite";
         $doiMessage = isset($dataCiteMessages[3])? $dataCiteMessages[3]: "No message returned from DataCite";
-        $this->setResponse('verbosemessage', $xmlMessage ."::".$doiMessage);
+        $this->setResponse('datacite1message', $xmlMessage);
+        $this->setResponse('datacite2message', $doiMessage);
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
@@ -304,6 +305,7 @@ class DOIServiceProvider
                 return false;
             }
             $result = $this->dataciteClient->updateURL($doiValue, $url);
+
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
                 //update the database DOIRepository
@@ -314,11 +316,7 @@ class DOIServiceProvider
                 return false;
             }
 
-            $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
-
-            $this->setResponse($httpCode[0],$httpCode[1]);
         }
 
         if(isset($xml) && $xml!="") {
@@ -338,12 +336,23 @@ class DOIServiceProvider
                 return false;
             }
 
-            $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
 
-            $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
-
-            $this->setResponse($httpCode[0],$httpCode[1]);
         }
+
+        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+        $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
+
+        $this->setResponse($httpCode[0],$httpCode[1]);
+
+        $httpCode = isset($dataCiteMessages[2])? explode(":",($dataCiteMessages[2])): array('httpCode','NoCodeReturned');
+
+        $this->setResponse($httpCode[0],$httpCode[1]);
+
+        $xmlMessage = isset($dataCiteMessages[1])? $dataCiteMessages[1]: "No message returned from DataCite";
+        $doiMessage = isset($dataCiteMessages[3])? $dataCiteMessages[3]: "No message returned from DataCite";
+        $this->setResponse('datacite1message', $xmlMessage);
+        $this->setResponse('datacite2message', $doiMessage);
 
         return true;
 
