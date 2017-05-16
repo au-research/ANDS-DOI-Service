@@ -6,6 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
 {
+    protected $fillable = [
+        'client_name',
+        'client_contact_name',
+        'ip_address',
+        'app_id',
+        'client_contact_email',
+        'datacite_prefix',
+        'datacite_symbol',
+        'shared_secret'
+    ];
+
+    public $timestamps = false;
+
     /**
      * The table of the model
      * @var string
