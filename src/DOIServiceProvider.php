@@ -172,6 +172,12 @@ class DOIServiceProvider
         // mint using dataciteClient
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
+        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
+
+        $xmlMessage = isset($dataCiteMessages[1])? $dataCiteMessages[1]: "No message returned from DataCite";
+        $doiMessage = isset($dataCiteMessages[3])? $dataCiteMessages[3]: "No message returned from DataCite";
+        $this->setResponse('verbosemessage', $xmlMessage ."::".$doiMessage);
+
         if ($result === true) {
             $this->setResponse('responsecode', 'MT001');
             $this->doiRepo->doiUpdate($doi, array('status'=>'ACTIVE'));
@@ -185,7 +191,7 @@ class DOIServiceProvider
         $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
         $this->setResponse($httpCode[0],$httpCode[1]);
 
-        $httpCode2 = isset($dataCiteMessages[1])? explode(":",($dataCiteMessages[1])): array('httpCode','NoCodeReturned');
+        $httpCode2 = isset($dataCiteMessages[2])? explode(":",($dataCiteMessages[2])): array('httpCode','NoCodeReturned');
         $this->setResponse($httpCode2[0],$httpCode2[1]);
 
         return $result;
