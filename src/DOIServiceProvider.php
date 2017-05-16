@@ -310,7 +310,7 @@ class DOIServiceProvider
 
             $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
-            $this->setResponse('dataCiteHTTPCode',$httpCode);
+            $this->setResponse('dataCiteHTTPCode',$httpCode[1]);
         }
 
         if(isset($xml) && $xml!="") {
@@ -334,7 +334,7 @@ class DOIServiceProvider
 
             $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
-            $this->setResponse('dataCiteHTTPCode',$httpCode);
+            $this->setResponse('dataCiteHTTPCode',$httpCode[1]);
         }
 
         return true;
@@ -396,7 +396,7 @@ class DOIServiceProvider
 
         $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
-        $this->setResponse('dataCiteHTTPCode',$httpCode);
+        $this->setResponse('dataCiteHTTPCode',$httpCode[1]);
 
         return $result;
     }
@@ -455,7 +455,7 @@ class DOIServiceProvider
 
         $httpCode = isset($dataCiteMessages[0])? explode(":",($dataCiteMessages[0])): array('httpCode','NoCodeReturned');
 
-        $this->setResponse('dataCiteHTTPCode',$httpCode);
+        $this->setResponse('dataCiteHTTPCode',$httpCode[1]);
 
         return $result;
 
