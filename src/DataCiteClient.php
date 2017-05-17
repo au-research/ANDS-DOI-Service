@@ -156,13 +156,13 @@ class DataCiteClient
 
         $outputINFO = curl_getinfo($ch);
 
-        $this->log($request."-DataCiteHTTPCODE:". $outputINFO['http_code']);
+        $this->log(".datacite.".$request.".httpcode:". $outputINFO['http_code']);
 
         if ($outputINFO['http_code'] >= 400) {
             $this->log(curl_error($ch), "error");
             $this->log($output, "error");
         } else {
-            $this->log($output);
+            $this->log(".datacite.".$request."response:".$output);
         }
 
         curl_close($ch);
