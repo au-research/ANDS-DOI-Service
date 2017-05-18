@@ -162,7 +162,7 @@ class DataCiteClient
             $this->log(curl_error($ch), "error");
             $this->log($output, "error");
         } else {
-            $this->log(".datacite.".$request."response:".$output);
+            $this->log(".datacite.".$request.".response:".$output);
         }
 
         curl_close($ch);
