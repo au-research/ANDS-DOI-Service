@@ -109,7 +109,8 @@ class DOIServiceProvider
     /**
      * Returns if a client is authenticated
      *
-     * @param $doiValue
+     * @param $doiValuegit status
+     * 
      * @return bool
      */
     public function isDoiAuthenticatedClients($doiValue)
@@ -178,13 +179,6 @@ class DOIServiceProvider
         } else {
             $this->setResponse('responsecode', 'MT005');
             $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
-        }
-
-        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
-
-        foreach($dataCiteMessages as $message){
-            $dataCiteMessage = explode(":",$message);
-            $this->setResponse($dataCiteMessage[0],$dataCiteMessage[1]);
         }
 
         return $result;
@@ -331,13 +325,6 @@ class DOIServiceProvider
 
         }
 
-        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
-
-        foreach($dataCiteMessages as $message){
-            $dataCiteMessage = explode(":",$message);
-            $this->setResponse($dataCiteMessage[0],$dataCiteMessage[1]);
-        }
-
         return true;
 
     }
@@ -393,13 +380,6 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT010');
         }
 
-        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
-
-        foreach($dataCiteMessages as $message){
-            $dataCiteMessage = explode(":",$message);
-            $this->setResponse($dataCiteMessage[0],$dataCiteMessage[1]);
-        }
-
         return $result;
     }
 
@@ -453,14 +433,7 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT010');
         }
 
-        $dataCiteMessages =$this->dataciteClient->getMessages()? $this->dataciteClient->getMessages(): array();
-
-        foreach($dataCiteMessages as $message){
-            $dataCiteMessage = explode(":",$message);
-            $this->setResponse($dataCiteMessage[0],$dataCiteMessage[1]);
-        }
-
-        return $result;
+         return $result;
 
     }
 
