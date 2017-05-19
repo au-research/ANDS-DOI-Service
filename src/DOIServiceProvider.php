@@ -110,7 +110,7 @@ class DOIServiceProvider
      * Returns if a client is authenticated
      *
      * @param $doiValuegit status
-     * 
+     *
      * @return bool
      */
     public function isDoiAuthenticatedClients($doiValue)
@@ -455,6 +455,10 @@ class DOIServiceProvider
     {
         return $this->response;
     }
-
+    
+    public function getDataCiteResponse()
+    {
+        return $this->dataciteClient->getResponse() ?: [];
+    }
 
 }
