@@ -52,7 +52,7 @@ class ClientRepository
 
         if ($id < 10) {
             $prefix .= "-";
-        } else {
+        } elseif ($id >= 100) {
             // prefix before the ID (new form)
             $prefix .= "C";
         }
