@@ -11,6 +11,58 @@ class ClientRepository
 
     private $message = null;
 
+    public function create($params)
+    {
+        $client = new Client;
+        $client->fill($params);
+        $client->save();
+
+        // update datacite_symbol
+        $this->generateDataciteSymbol($client);
+
+        return $client;
+    }
+
+    public function getAll()
+    {
+        return Client::all();
+    }
+
+    /**
+     * Generate a datacite symbol for the given client
+     * ANDS.CENTRE-1
+     * ANDS.CENTRE-9
+     * ANDS.CENTRE10
+     * ANDS.CENTRE99
+     * ANDS.C100
+     * ANDS.C102
+     *
+     * @param Client $client
+     * @return Client
+     */
+    public function generateDataciteSymbol(Client $client)
+    {
+        $prefix = "ANDS.";
+        $id = $client->client_id;
+
+        // prefix before the
+        if ($id < 100) {
+            $prefix .= "CENTRE";
+        }
+
+        if ($id < 10) {
+            $prefix .= "-";
+        } else {
+            // prefix before the ID (new form)
+            $prefix .= "C";
+        }
+
+        $client->datacite_symbol = $prefix.$id;
+        $client->save();
+
+        return $client;
+    }
+
     public function getFirst()
     {
         return Client::first();
