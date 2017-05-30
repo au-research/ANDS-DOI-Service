@@ -290,8 +290,18 @@ class DOIServiceProvider
                 $this->setResponse("responsecode", "MT014");
                 return false;
             }
-            $result = $this->dataciteClient->updateURL($doiValue, $url);
+        }
 
+        if(isset($xml) && $xml!="") {
+            // Validate xml
+            if ($this->validateXML($xml) === false) {
+                $this->setResponse('responsecode', 'MT007');
+                return false;
+            }
+        }
+
+        if (isset($url) && $url!="") {
+            $result = $this->dataciteClient->updateURL($doiValue, $url);
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
                 //update the database DOIRepository
@@ -301,16 +311,10 @@ class DOIServiceProvider
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
                 return false;
             }
-
-
         }
 
+
         if(isset($xml) && $xml!="") {
-            // Validate xml
-            if ($this->validateXML($xml) === false) {
-                $this->setResponse('responsecode', 'MT007');
-                return false;
-            }
             $result = $this->dataciteClient->update($xml);
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
@@ -321,10 +325,7 @@ class DOIServiceProvider
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
                 return false;
             }
-
-
         }
-
         return true;
 
     }
