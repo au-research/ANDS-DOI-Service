@@ -319,7 +319,7 @@ class DOIServiceProvider
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
                 //update the database DOIRepository
-                $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml));
+                $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml,'status'=>'ACTIVE'));
             } else {
                 $this->setResponse('responsecode', 'MT010');
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
