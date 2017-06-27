@@ -109,7 +109,8 @@ class DOIServiceProvider
     /**
      * Returns if a client is authenticated
      *
-     * @param $doiValue
+     * @param $doiValuegit status
+     *
      * @return bool
      */
     public function isDoiAuthenticatedClients($doiValue)
@@ -289,6 +290,17 @@ class DOIServiceProvider
                 $this->setResponse("responsecode", "MT014");
                 return false;
             }
+        }
+
+        if(isset($xml) && $xml!="") {
+            // Validate xml
+            if ($this->validateXML($xml) === false) {
+                $this->setResponse('responsecode', 'MT007');
+                return false;
+            }
+        }
+
+        if (isset($url) && $url!="") {
             $result = $this->dataciteClient->updateURL($doiValue, $url);
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
@@ -301,24 +313,19 @@ class DOIServiceProvider
             }
         }
 
+
         if(isset($xml) && $xml!="") {
-            // Validate xml
-            if ($this->validateXML($xml) === false) {
-                $this->setResponse('responsecode', 'MT007');
-                return false;
-            }
             $result = $this->dataciteClient->update($xml);
             if ($result === true) {
                 $this->setResponse('responsecode', 'MT002');
                 //update the database DOIRepository
-                $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml));
+                $this->doiRepo->doiUpdate($doi, array('datacite_xml'=>$xml,'status'=>'ACTIVE'));
             } else {
                 $this->setResponse('responsecode', 'MT010');
                 $this->setResponse('verbosemessage', array_first($this->dataciteClient->getErrors()));
                 return false;
             }
         }
-
         return true;
 
     }
@@ -418,6 +425,7 @@ class DOIServiceProvider
 
         $result = $this->dataciteClient->deActivate($doiValue);
 
+
         if ($result === true) {
             $this->setResponse('responsecode', 'MT003');
             //update the database DOIRepository
@@ -426,7 +434,7 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT010');
         }
 
-        return $result;
+         return $result;
 
     }
 
@@ -448,6 +456,10 @@ class DOIServiceProvider
     {
         return $this->response;
     }
-
+    
+    public function getDataCiteResponse()
+    {
+        return $this->dataciteClient->getResponse() ?: [];
+    }
 
 }

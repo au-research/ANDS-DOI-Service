@@ -131,6 +131,9 @@ class DataCiteClient
     public function request($url, $content = false, $customRequest = false)
     {
 
+        $request_parts = explode('/', $url);
+        $request = $request_parts[3];
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -153,13 +156,18 @@ class DataCiteClient
 
         $outputINFO = curl_getinfo($ch);
 
-        $this->log("DataCiteHTTPCODE:". $outputINFO['http_code']);
+        $this->log([
+            "httpcode" => $outputINFO['http_code'],
+            "url" => $url,
+            "endpoint" => $request,
+            "output" => $output
+        ]);
 
         if ($outputINFO['http_code'] >= 400) {
             $this->log(curl_error($ch), "error");
             $this->log($output, "error");
         } else {
-            $this->log($output);
+            $this->log(".datacite.".$request.".response:".$output);
         }
 
         curl_close($ch);
