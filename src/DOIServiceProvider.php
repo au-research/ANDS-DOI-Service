@@ -293,6 +293,9 @@ class DOIServiceProvider
         }
 
         if(isset($xml) && $xml!="") {
+            // need to check that doi provided in xml matches doi
+            $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
+
             // Validate xml
             if ($this->validateXML($xml) === false) {
                 $this->setResponse('responsecode', 'MT007');
