@@ -258,6 +258,22 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
     }
 
+
+    /** @test * */
+    public function it_should_add_or_change_doi_before_validate_before_update()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+        $xml = file_get_contents(__DIR__ . "/assets/sample_wrong_doi.xml");
+
+        //update a DOI and make sure that the xml provided changes to correct DOI
+        $result = $service->update("10.5072/00/59DC1060B294F",null,$xml);
+
+        $this->assertTrue($result);
+
+    }
+
     /** @test **/
     public function it_should_add_doi_and_work_with_utf8()
     {
@@ -280,6 +296,16 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     private function getTestXML()
     {
         return file_get_contents(__DIR__ . "/assets/sample.xml");
+    }
+
+    /**
+     * Helper method for getting the sample XML for testing purpose
+     *
+     * @return string
+     */
+    private function getTestXMLWrongDoi()
+    {
+        return file_get_contents(__DIR__ . "/assets/sample_wrong_doi.xml");
     }
 
 
