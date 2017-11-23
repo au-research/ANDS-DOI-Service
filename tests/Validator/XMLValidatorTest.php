@@ -67,10 +67,4 @@ class XMLValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(XMLValidator::create()->validateSchemaVersion($xml));
     }
 
-    public function setUp()
-    {
-        $dotenv = new Dotenv('./');
-        $dotenv->load();
-    }
-
 }
