@@ -163,7 +163,7 @@ class DataCiteClient
             "output" => $output
         ]);
 
-        if ($outputINFO['http_code'] >= 400) {
+        if ($outputINFO['http_code'] >= 400 || curl_errno($ch)) {
             $this->log(curl_error($ch), "error");
             $this->log($output, "error");
         } else {
