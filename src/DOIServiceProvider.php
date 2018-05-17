@@ -388,6 +388,44 @@ class DOIServiceProvider
     }
 
     /**
+     * get status of the DOI
+     *
+     * @param $doiValue
+     * @return bool
+     */
+    public function getStatus($doiValue)
+    {
+        // validate client
+        if (!$this->isClientAuthenticated()) {
+            $this->setResponse('responsecode', 'MT009');
+            return false;
+        }
+
+        //get the doi info
+        $doi = $this->doiRepo->getByID($doiValue);
+        $this->setResponse('doi', $doiValue);
+
+        if ($doi === null) {
+            $this->setResponse('responsecode', 'MT011');
+            return true;
+        }
+
+        // check if this client owns this doi
+        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage', $doiValue . " is not owned by " . $this->getAuthenticatedClient()->client_name);
+            return false;
+        }
+
+        $this->setResponse('responsecode', 'MT013');
+        $this->setResponse('verbosemessage', 'DOI ' . $doiValue . ' status ' . $doi->status);
+
+        return true;
+
+    }
+
+
+    /**
      * Deactivate a DOI
      *
      * @param $doiValue
