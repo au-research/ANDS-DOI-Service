@@ -42,4 +42,15 @@ class Client extends Model
             ClientDomain::class, "client_id", "client_id"
         );
     }
+
+    /**
+     * Returns all the prefixes assigned to this client
+     */
+    public function prefixes()
+    {
+        return $this->hasMany(
+            ClientPrefixes::class, "client_id", "client_id"
+        );
+    }
+    
 }

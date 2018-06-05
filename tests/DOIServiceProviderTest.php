@@ -8,7 +8,7 @@ use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Repository\DoiRepository;
 use ANDS\DOI\Validator\XMLValidator;
 use Dotenv\Dotenv;
-use ANDS\DOI\DataCiteClient;
+use ANDS\DOI\MdsClient;
 
 class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 {
@@ -260,6 +260,39 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
 
     /** @test * */
+    public function it_should_add_identifier_before_validate()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_without_identifier.xml"),false
+        );
+
+
+        $this->assertTrue($result);
+
+    }
+
+    /** @test * */
+    public function it_should_add_identifier_before_validate_before_update()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+        $xml = file_get_contents(__DIR__ . "/assets/sample_without_identifier_update.xml");
+
+        //update a DOI and make sure that the xml provided changes to correct DOI
+        $result = $service->update("10.5072/00/TEST_DOI_5afe2b8c3174f",null,$xml);
+
+        $this->assertTrue($result);
+
+    }
+
+
+    /** @test * */
     public function it_should_add_or_change_doi_before_validate_before_update()
     {
         $service = $this->getServiceProvider();
@@ -359,7 +392,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         );
 
-        $dataciteClient = new \ANDS\DOI\DataCiteClient(
+        $dataciteClient = new MdsClient(
             getenv("DATACITE_USERNAME"),
             getenv("DATACITE_PASSWORD")
         );

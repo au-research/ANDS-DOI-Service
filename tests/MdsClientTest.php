@@ -1,9 +1,9 @@
 <?php
 
-use ANDS\DOI\DataCiteClient;
+use ANDS\DOI\MdsClient;
 use ANDS\DOI\Validator\XMLValidator;
 
-class DataCiteClientTest extends PHPUnit_Framework_TestCase
+class MdsClientTest extends PHPUnit_Framework_TestCase
 {
 
     /** @test */
@@ -148,7 +148,7 @@ class DataCiteClientTest extends PHPUnit_Framework_TestCase
         $username = getenv('DATACITE_USERNAME');
         $password = getenv('DATACITE_PASSWORD');
 
-        $client = new DataCiteClient($username, $password);
+        $client = new MdsClient($username, $password);
         $client->setDataciteUrl(getenv('DATACITE_URL'));
 
         return $client;

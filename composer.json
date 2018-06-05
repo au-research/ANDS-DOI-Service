@@ -17,13 +17,17 @@
         "clearTestReports": "rm -rf tests/reports/*"
     },
     "autoload": {
+        "psr-0": {
+            "PHPUnit": "vendor/phpunit/"
+        }
         "psr-4": {
             "ANDS\\DOI\\": "src"
         }
     },
     "require" : {
         "vlucas/phpdotenv": "^2.1",
-        "illuminate/database": "5.2.*"
+        "illuminate/database": "5.2.*",
+        "guzzle/http": "^3.9"
     },
     "require-dev": {
         "phpunit/phpunit": "4.8.*"
@@ -31,4 +35,5 @@
     "config": {
         "optimize-autoloader": true
     }
+
 }
