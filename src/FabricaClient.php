@@ -16,7 +16,7 @@ class FabricaClient implements DataCiteClient
 
     private $username;
     private $password;
-    private $dataciteUrl = 'https://mds.test.datacite.org/';
+    private $dataciteUrl = 'https://app.test.datacite.org/';
 
     private $errors = array();
     private $messages = array();

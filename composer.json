@@ -17,9 +17,6 @@
         "clearTestReports": "rm -rf tests/reports/*"
     },
     "autoload": {
-        "psr-0": {
-            "PHPUnit": "vendor/phpunit/"
-        }
         "psr-4": {
             "ANDS\\DOI\\": "src"
         }

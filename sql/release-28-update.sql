@@ -29,9 +29,9 @@ from doi_client, prefixes
 where doi_client.datacite_prefix = prefixes.prefix_value;
 
 
---select * from prefixes;
+-- select * from prefixes;
 
---select * from doi_client_prefixes;
+-- select * from doi_client_prefixes;
 
 SET SQL_SAFE_UPDATES=0;
 -- set all currently used prefixes as non-active
