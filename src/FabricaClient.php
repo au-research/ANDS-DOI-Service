@@ -247,19 +247,26 @@ class FabricaClient implements DataCiteClient
     }
 
 
-    public function getClientInfo(TrustedClient $client){
-        $attributes = array("name" => $client->client_name,
+    /**
+     * @param TrustedClient $client
+     * @return string
+     */
+    public function getClientInfo(TrustedClient $client)
+    {
+        $attributes = [
+            "name" => $client->client_name,
             "symbol" => $client->datacite_symbol,
             "domains" => $this->getClientDomains($client),
             "is-active" => true,
             "contact-name" => $client->client_name,
-            "contact-email" => getenv("DATACITE_CONTACT_EMAIL"));
-        $provider = array("data" => array("type" => "providers",
-            "id" => "ands"));
+            "contact-email" => getenv("DATACITE_CONTACT_EMAIL")
+        ];
+        $provider = ["data" => ["type" => "providers",
+            "id" => "ands"]];
         $prefixes = $this->getPrefixes($client);
-        $relationships = array("provider" => $provider, "prefixes" => $prefixes);
-        $clientInfo = array("data" => array("attributes" => $attributes, "relationships" => $relationships, "type" => "client"));
-    return json_encode($clientInfo);
+        $relationships = ["provider" => $provider, "prefixes" => $prefixes];
+        $clientInfo = ["data" => ["attributes" => $attributes, "relationships" => $relationships, "type" => "client"]];
+        return json_encode($clientInfo);
     }
 
     public function getClientDomains(TrustedClient $client){

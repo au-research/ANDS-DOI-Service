@@ -43,6 +43,9 @@ class Client extends Model
         );
     }
 
+    public function addDomain($domain){
+        
+    }
     /**
      * Returns all the prefixes assigned to this client
      */
