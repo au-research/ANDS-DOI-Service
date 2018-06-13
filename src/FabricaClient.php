@@ -221,7 +221,7 @@ class FabricaClient implements DataCiteClient
 
     public function getClients()
     {
-        $result = $this->http->get('/clients')->send();
+        $result = $this->http->get('/clients', [], ["query" => ['provider-id'=>'ands']])->send();
         return $result->json();
     }
 
@@ -240,12 +240,17 @@ class FabricaClient implements DataCiteClient
         return $result->json();
     }
 
+    public function getUnAssignedPrefixes()
+    {
+        $result = $this->http->get('/prefixes',[], ["query" => ['state'=>'unassigned']])->send();
+        return $result->json();
+    }
+
     public function getUnalocatedPrefixes()
     {
         $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands','state'=>'without-client']])->send();
         return $result->json();
     }
-
 
     /**
      * @param TrustedClient $client

@@ -34,27 +34,37 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function it_should_get_all_prefixes(){
-        $this->fabricaClient->getProviderPrefixes();
+    public function it_should_get_all_UnAssigned_prefixes(){
+        $unAssignedPrefixes = $this->fabricaClient->getUnAssignedPrefixes();
+        //var_dump(sizeof($unAssignedPrefixes['data']));
+        $this->assertGreaterThan(24, sizeof($unAssignedPrefixes['data']));
+
     }
 
     /** @test */
     public function it_should_get_all_Unalocated_prefixes(){
-        $this->fabricaClient->getUnalocatedPrefixes();
+        $unAllocatedPrefixes = $this->fabricaClient->getUnalocatedPrefixes();
+        $unAllocatedPrefixeArray = [];
+        foreach($unAllocatedPrefixes['data'] as $data){
+            $unAllocatedPrefixeArray[] = $data['relationships']['prefix']['data']['id'];
+        }
+        $this->assertGreaterThan(2, sizeof($unAllocatedPrefixeArray));
     }
     
     /** @test */
     public function it_should_get_all_clients()
     {
         $clients = $this->fabricaClient->getClients();
-        dd($clients);
+        $this->assertGreaterThan(10, sizeof($clients['data']));
     }
+
     /** @test  **/
     public function it_should_find_client_by_symbol_remote()
     {
         $trustedCient = $this->fabricaClient->getClientByDataCiteSymbol("ANDS.CENTRE82");
-        dd($trustedCient);
+        $this->assertEquals("ands.centre82", $trustedCient['data']['id']);
     }
+
     /** @test  **/
     public function it_should_create_clientInfo_from_local_client_object()
     {
@@ -63,7 +73,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $client = $repo->getByID($testID);
         
         $clientInfo = $this->fabricaClient->getClientInfo($client);
-        dd($clientInfo);
+        $this->assertContains("ANDS.CENTRE-0", $clientInfo);
     }
 
     /**

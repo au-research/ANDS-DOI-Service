@@ -15,5 +15,5 @@ class Prefix Extends Model
     protected $table = "prefixes";
     protected $primaryKey = "id";
     protected $fillable = ["prefix_value"];
-
+    public $timestamps = false;
 }
