@@ -220,4 +220,11 @@ class MdsClient implements DataCiteClient
     {
         return count($this->getErrors()) > 0 ? true : false;
     }
+
+    public function clearResponse()
+    {
+        $this->errors = [];
+        $this->messages = [];
+        return $this;
+    }
 }

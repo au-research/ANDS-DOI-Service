@@ -12,6 +12,8 @@ use ANDS\DOI\MdsClient;
 
 class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 {
+    private $testDoiId;
+
     /** @test */
     public function it_should_be_able_to_create_a_service_provider()
     {
@@ -193,11 +195,10 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $response = $service->getResponse();
 
         $doi = $response['doi'];
-
+        $service->activate($doi);
         // deactivate it
         $result = $service->deactivate($doi);
         $this->assertTrue($result);
-
         // this DOI should now be activated
         $this->assertTrue($service->activate($doi));
 
@@ -228,7 +229,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->isDoiAuthenticatedClients('10.5072/00/53ED646B7A9A6'));
+        $this->assertTrue($service->isDoiAuthenticatedClients($this->testDoiId));
 
     }
 
@@ -237,7 +238,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertFalse($service->isDoiAuthenticatedClients('10.5072/11/53ED646B7A9A6'));
+        $this->assertFalse($service->isDoiAuthenticatedClients("10.656565/343333333"));
 
     }
 
@@ -285,7 +286,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $xml = file_get_contents(__DIR__ . "/assets/sample_without_identifier_update.xml");
 
         //update a DOI and make sure that the xml provided changes to correct DOI
-        $result = $service->update("10.5072/00/TEST_DOI_5afe2b8c3174f",null,$xml);
+        $result = $service->update($this->testDoiId, null, $xml);
 
         $this->assertTrue($result);
 
@@ -301,7 +302,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $xml = file_get_contents(__DIR__ . "/assets/sample_wrong_doi.xml");
 
         //update a DOI and make sure that the xml provided changes to correct DOI
-        $result = $service->update("10.5072/00/59DC1060B294F",null,$xml);
+        $result = $service->update($this->testDoiId, null, $xml);
 
         $this->assertTrue($result);
 
@@ -362,7 +363,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      */
     private function getTestClient()
     {
-        $dotenv = new Dotenv('./');
+        $dotenv = new Dotenv(__DIR__.'/../');
         $dotenv->load();
 
         $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
@@ -376,8 +377,11 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
      */
     private function getServiceProvider()
     {
-        $dotenv = new Dotenv('./');
+        $dotenv = new Dotenv(__DIR__.'/../');
         $dotenv->load();
+
+        $this->testDoiId = getenv('TEST_DOI_ID');
+
         $clientRepository = new ClientRepository(
             getenv("DATABASE_URL"),
             getenv("DATABASE"),

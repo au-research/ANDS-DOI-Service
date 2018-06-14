@@ -12,7 +12,7 @@ class ClientPrefixes extends Model
     public $timestamps = false;
     public function prefix()
     {
-        return $this->hasMany(
+        return $this->hasOne(
             Prefix::class,  "id", "prefix_id");
     }
     

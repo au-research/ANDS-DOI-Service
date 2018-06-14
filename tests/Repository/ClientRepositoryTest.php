@@ -248,7 +248,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        $this->removeTestClient();
         parent::tearDown();
+        $this->removeTestClient();
     }
 }

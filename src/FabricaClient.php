@@ -288,13 +288,10 @@ class FabricaClient implements DataCiteClient
 
     public function getPrefixes(TrustedClient $client){
         $prefixes = array();
-        foreach ($client->prefixes as $prefix) {
-            foreach ($prefix->prefix as $p) {
-                $prefixes[] = array("id" => trim($p->prefix_value, "/"),
+        foreach ($client->prefixes as $clientPrefix) {
+                $prefixes[] = array("id" => trim($clientPrefix->prefix->prefix_value, "/"),
                     "type" => "prefix");
-            }
         }
         return array("data" => $prefixes);
     }
-
 }

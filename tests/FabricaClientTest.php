@@ -17,23 +17,6 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function it_should_add_a_client()
-    {
-        // given we have a client
-        $testID = 0;
-        $repo = $this->fabricaClient->getClientRepository();
-        $client = $repo->getByID($testID);
-
-        // we add it to datacite
-        $this->client->addClient($client);
-
-        // then we can see it on datacite
-//        $fetch = $this->client->fetchClient($client->id);
-
-        // compare
-    }
-
-    /** @test */
     public function it_should_get_all_UnAssigned_prefixes(){
         $unAssignedPrefixes = $this->fabricaClient->getUnAssignedPrefixes();
         //var_dump(sizeof($unAssignedPrefixes['data']));
