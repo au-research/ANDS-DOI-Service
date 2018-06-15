@@ -10,6 +10,7 @@ namespace ANDS\DOI;
 use ANDS\DOI\Repository\ClientRepository;
 use ANDS\DOI\Model\Client as TrustedClient;
 use Guzzle\Http\Client as GuzzleClient;
+use Guzzle\Http\Exception\ClientErrorResponseException;
 
 class FabricaClient implements DataCiteClient
 {
@@ -184,38 +185,74 @@ class FabricaClient implements DataCiteClient
 
     public function addClient(TrustedClient $client)
     {
-
         $clientInfo = $this->getClientInfo($client);
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
+        ];
+        $response = "";
+        $request = $this->http->post('/clients', $headers, $clientInfo);
 
-        $result = $this->http->post('/clients', $clientInfo);
-
-        // TODO parse result;
-        return $result;
+        try {
+            $response = $request->send();
+        } catch (ClientErrorResponseException $e) {
+            $this->errors = $e->getResponse()->json();
+        }
+        $this->messages[] = $response;
     }
 
     public function updateClient(TrustedClient $client)
     {
-
         $clientInfo = $this->getClientInfo($client);
-
-        $result = $this->http->patch('/clients', $clientInfo);
-
-        // TODO parse result;
-        return $result;
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
+        ];
+        $response = "";
+        $request = $this->http->patch('/clients/'.$client->datacite_symbol, $headers, $clientInfo);
+        try {
+            $response = $request->send();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
     }
 
     public function deleteClient(TrustedClient $client)
     {
-        
-        $result = $this->http->delete('/clients', $client->datacite_symbol);
-
-        // TODO parse result;
-        return $result;
+        $response= "";
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
+        ];
+        try {
+            $response = $this->http->delete('/clients/'.$client->datacite_symbol, $headers)->send();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
     }
     
     public function getClientByDataCiteSymbol($datacite_symbol)
     {
-        $result = $this->http->get("/clients/$datacite_symbol")->send();
+        $result = [];
+        try{
+            $result = $this->http->get("/clients/$datacite_symbol")->send();
+        }
+        catch(Exception $e){
+            print($e->getMessage());
+        }
         return $result->json();
     }
 
