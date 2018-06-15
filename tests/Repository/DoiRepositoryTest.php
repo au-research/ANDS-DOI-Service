@@ -1,6 +1,6 @@
 <?php
 
-use ANDS\DOI\DataCiteClient;
+use ANDS\DOI\MdsClient;
 use ANDS\DOI\DOIServiceProvider;
 use ANDS\DOI\Model\Client;
 use ANDS\DOI\Model\Doi;
@@ -142,7 +142,7 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         );
 
-        $dataciteClient = new DataCiteClient(
+        $dataciteClient = new MdsClient(
             getenv("DATACITE_USERNAME"),
             getenv("DATACITE_PASSWORD")
         );

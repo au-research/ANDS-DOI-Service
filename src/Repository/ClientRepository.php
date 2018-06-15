@@ -4,6 +4,8 @@ namespace ANDS\DOI\Repository;
 
 use ANDS\DOI\Validator\IPValidator;
 use ANDS\DOI\Model\Client as Client;
+use ANDS\DOI\Model\ClientPrefixes as ClientPrefixes;
+use ANDS\DOI\Model\Prefix as Prefix;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ClientRepository
@@ -20,6 +22,15 @@ class ClientRepository
         // update datacite_symbol
         $this->generateDataciteSymbol($client);
 
+        return $client;
+    }
+
+    public function updateClient($params)
+    {
+        $clientId = $params['client_id'];
+        $client = $this->getByID($clientId);
+        $client->update($params);
+        $client->save();
         return $client;
     }
 
@@ -78,6 +89,20 @@ class ClientRepository
         return Client::where('app_id', $appID)->first();
     }
 
+    public function deleteClientById($id)
+    {
+        $client = Client::find($id);
+        $client->removeClientDomains();
+        $client->removeClientPrefixes();
+        Client::find($id)->delete();
+    }
+
+
+    public function getUnalocatedPrefixes(){
+        $usedPrefixIds = ClientPrefixes::pluck('prefix_id')->all();
+        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->get();
+        return $prefixes;
+    }
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *

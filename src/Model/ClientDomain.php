@@ -10,4 +10,5 @@ class ClientDomain extends Model
     protected $table = "doi_client_domains";
     protected $primaryKey = "clientdomainid";
     protected $fillable = ['client_domain'];
+    public $timestamps = false;
 }

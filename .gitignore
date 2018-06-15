@@ -1,4 +1,5 @@
 .env
+phpunit
 composer.phar
 /vendor/
 .idea/
