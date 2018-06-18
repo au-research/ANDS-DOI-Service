@@ -292,6 +292,16 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /** @test * */
+    public function it_should_not_add_client_id_to_new_doiValues()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+        $new_doi = $service->getNewDOI();
+        $client_id_str = str_pad($this->getTestClient()->client_id, 2,0,STR_PAD_LEFT)."/";
+        $this->assertNotContains($client_id_str, $new_doi);
+
+    }
 
     /** @test * */
     public function it_should_add_or_change_doi_before_validate_before_update()
