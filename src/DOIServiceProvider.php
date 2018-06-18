@@ -209,7 +209,7 @@ class DOIServiceProvider
      *
      * @return string
      */
-    private function getNewDOI()
+    public function getNewDOI()
     {
         // get the first active prefix for this authenticated client
         $activeClientPrefix = $this->getAuthenticatedClient()->prefixes->filter(function($prefix){
@@ -226,11 +226,9 @@ class DOIServiceProvider
 
         $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
 
-        $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
-
         $doiValue = uniqid();
 
-        return $prefix . $client_id . $testStr . $doiValue;
+        return $prefix . $testStr . $doiValue;
     }
 
     public function insertNewDOI($doiValue,$xml,$url){
