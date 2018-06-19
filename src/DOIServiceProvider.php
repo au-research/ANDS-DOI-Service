@@ -116,8 +116,11 @@ class DOIServiceProvider
     public function isDoiAuthenticatedClients($doiValue)
     {
         $client = $this->getAuthenticatedClient();
-        $clientPrefix = $client->datacite_prefix . str_pad($client->client_id, 2, 0, STR_PAD_LEFT) . "/";
-        return (strpos($doiValue, $clientPrefix) === 0);
+        foreach ($client->prefixes as $clientPrefix) {
+            if(strpos($doiValue, $clientPrefix->prefix->prefix_value) === 0)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -206,10 +209,16 @@ class DOIServiceProvider
      *
      * @return string
      */
-    private function getNewDOI()
+    public function getNewDOI()
     {
-        $prefix = $this->getAuthenticatedClient()->datacite_prefix;
+        // get the first active prefix for this authenticated client
+        $activeClientPrefix = $this->getAuthenticatedClient()->prefixes->filter(function($prefix){
+            return $prefix->active;
+        })->first()->prefix;
+        $prefix = $activeClientPrefix->prefix_value;
 
+        $prefix = ends_with($prefix, '/') ? $prefix : $prefix .'/';
+        
         // set to test prefix if  authenticated client is a test DOI APP ID
         if (substr($this->getAuthenticatedClient()->app_id, 0, 4) == 'TEST') {
             $prefix = "10.5072/";
@@ -217,11 +226,9 @@ class DOIServiceProvider
 
         $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
 
-        $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
-
         $doiValue = uniqid();
 
-        return $prefix . $client_id . $testStr . $doiValue;
+        return $prefix . $testStr . $doiValue;
     }
 
     public function insertNewDOI($doiValue,$xml,$url){
@@ -465,7 +472,6 @@ class DOIServiceProvider
         }
 
         $result = $this->dataciteClient->deActivate($doiValue);
-
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT003');
