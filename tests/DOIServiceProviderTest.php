@@ -75,7 +75,6 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $service->setAuthenticatedClient($this->getTestClient());
 
         $this->assertTrue($service->isClientAuthenticated());
-
         $result = $service->mint(
             "http://devl.ands.org.au/minh/", $this->getTestXML(),false
         );

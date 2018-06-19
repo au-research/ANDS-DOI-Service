@@ -87,12 +87,18 @@ class Client extends Model
     }
     /** add prefix to client */
 
-    public function addClientPrefix($prefix_value, $status = true){
+    public function addClientPrefix($prefix_value, $active = true){
 
         $prefix = null;
         $prefix_value = trim($prefix_value);
         if($prefix_value == '')
             return;
+
+        //set all other prefixes for this client as non active if this prefix is the active one
+        if($active){
+            ClientPrefixes::where("client_id", $this->client_id)->update(["active"=>false]);
+        }
+
         try {
             // Get the Prefix if exists
             $prefix = Prefix::where("prefix_value", $prefix_value)->first();
@@ -101,6 +107,8 @@ class Client extends Model
                 $cp = ClientPrefixes::where("prefix_id", $prefix->id)
                     ->where("client_id", $this->client_id)->first();
                 if ($cp != null) {
+                    ClientPrefixes::where("prefix_id", $prefix->id)
+                        ->where("client_id", $this->client_id)->update(["active"=>$active]);
                     return;
                 }
             }
@@ -115,7 +123,10 @@ class Client extends Model
             $prefix->save();
         }
 
-        $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "status"=>$status]));
+        $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active]));
+
+
+
     }
 
     public function removeClientPrefix($prefix_value){
