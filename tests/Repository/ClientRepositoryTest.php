@@ -179,21 +179,10 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     /** @test  **/
     public function should_return_unallocated_prefixes()
     {
-        $client = $this->createTestClient();
-        $client->removeClientPrefixes();
-        $prefixesArray = [];
-        $unalloc = $this->repo->getUnalocatedPrefixes();
-        $this->assertNotEmpty($unalloc);
-        foreach ($unalloc as $p)
-        {
-            $client->addClientPrefix($p->prefix_value, false);
-        }
-        $unalloc = $this->repo->getUnalocatedPrefixes();
-        $this->assertEmpty($unalloc);
-        $client->removeClientPrefixes();
         $unalloc = $this->repo->getUnalocatedPrefixes();
         $this->assertNotEmpty($unalloc);
     }
+
     /**
      * Helper method to return a new ClientRepository for each test
      *

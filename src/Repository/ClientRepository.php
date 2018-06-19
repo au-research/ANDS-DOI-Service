@@ -99,7 +99,7 @@ class ClientRepository
 
 
     public function getUnalocatedPrefixes(){
-        $usedPrefixIds = ClientPrefixes::pluck('prefix_id')->all();
+        $usedPrefixIds = ClientPrefixes::select('prefix_id')->where('active', true)->get();
         $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->get();
         return $prefixes;
     }
