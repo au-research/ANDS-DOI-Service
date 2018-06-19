@@ -13,6 +13,12 @@ class ClientRepository
 
     private $message = null;
 
+    /**
+     * Create a client
+     *
+     * @param $params
+     * @return Client
+     */
     public function create($params)
     {
         $client = new Client;
@@ -25,6 +31,12 @@ class ClientRepository
         return $client;
     }
 
+    /**
+     * Update a client
+     *
+     * @param $params
+     * @return Client
+     */
     public function updateClient($params)
     {
         $clientId = $params['client_id'];
@@ -34,6 +46,11 @@ class ClientRepository
         return $client;
     }
 
+    /**
+     * Returns all Clients
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
     public function getAll()
     {
         return Client::all();
@@ -68,41 +85,53 @@ class ClientRepository
             $prefix .= "C";
         }
 
-        $client->datacite_symbol = $prefix.$id;
+        $client->datacite_symbol = $prefix . $id;
         $client->save();
 
         return $client;
     }
 
-    public function getFirst()
-    {
-        return Client::first();
-    }
-
+    /**
+     * @param $id
+     * @return Client
+     */
     public function getByID($id)
     {
         return Client::find($id);
     }
 
+    /**
+     * @param $appID
+     * @return Client
+     */
     public function getByAppID($appID)
     {
         return Client::where('app_id', $appID)->first();
     }
 
+    /**
+     * @param $id
+     */
     public function deleteClientById($id)
     {
-        $client = Client::find($id);
+        $client = static::getByID($id);
         $client->removeClientDomains();
         $client->removeClientPrefixes();
-        Client::find($id)->delete();
+
+        // TODO soft delete
+        $client->delete();
     }
 
-
-    public function getUnalocatedPrefixes(){
+    /**
+     * @return mixed
+     */
+    public function getUnalocatedPrefixes()
+    {
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->where('active', true)->get();
         $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->get();
         return $prefixes;
     }
+
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *
@@ -110,7 +139,7 @@ class ClientRepository
      * @param null $sharedSecret
      * @param null $ipAddress
      * @param bool $manual
-     * @return bool
+     * @return Client|bool
      */
     public function authenticate(
         $appID,
@@ -119,8 +148,8 @@ class ClientRepository
         $manual = false
     ) {
         $test_prefix = false;
-        if(substr($appID,0,4)=="TEST") {
-            $appID = str_replace("TEST","",$appID);
+        if (substr($appID, 0, 4) == "TEST") {
+            $appID = str_replace("TEST", "", $appID);
             $test_prefix = true;
         }
         $client = $this->getByAppID($appID);
@@ -138,7 +167,9 @@ class ClientRepository
 
         //client exists and has been set to a test account via the app_id make sure that the test prefix is used
 
-        if($test_prefix) $client['datacite_prefix'] = "10.5072/";
+        if ($test_prefix) {
+            $client['datacite_prefix'] = "10.5072/";
+        }
 
         // if sharedSecret is provided
         if ($sharedSecret) {
@@ -154,7 +185,7 @@ class ClientRepository
         if ($ipAddress &&
             IPValidator::validate($ipAddress, $client->ip_address) === false
         ) {
-            $this->setMessage("Authentication Failed. Mismatch IP Address. Provided IP Address: ". $ipAddress);
+            $this->setMessage("Authentication Failed. Mismatch IP Address. Provided IP Address: " . $ipAddress);
             return false;
         }
 
@@ -210,6 +241,5 @@ class ClientRepository
         $this->message = $message;
         return $this;
     }
-
 
 }
