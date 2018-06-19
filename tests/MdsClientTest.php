@@ -15,7 +15,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
     public function test_mint_a_new_doi()
     {
         $xml = file_get_contents(__DIR__ . "/assets/sample.xml");
-        $doi = '10.5072/00/'.uniqid();
+        $doi = '10.5072/'.uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $this->client->mint(
             $doi, "https://devl.ands.org.au/minh/", $xml, false
@@ -56,7 +56,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
     public function it_should_mint_a_schema_version_4_doi()
     {
         $xml = file_get_contents(__DIR__ . "/assets/datacite-example-full-v4.0.xml");
-        $doi = '10.5072/00/'.uniqid();
+        $doi = '10.5072/'.uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $this->client->mint(
             $doi, "https://devl.ands.org.au/minh/", $xml, false
@@ -82,7 +82,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         $metadata = $this->client->getMetadata($this->testDoiId);
         $replace= file_get_contents(__DIR__."/assets/replace_sample.xml");
         $this->client->update($replace);
-        $this->assertEquals($this->client->getMetadata($this->testDoiId),$replace);
+        $this->assertEquals($this->client->getMetadata($this->testDoiId), $replace);
         //revert back to old xml
         $this->client->update($metadata);
     }

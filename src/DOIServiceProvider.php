@@ -424,8 +424,8 @@ class DOIServiceProvider
             return false;
         }
 
-        $this->setResponse('responsecode', 'MT013');
-        $this->setResponse('verbosemessage', 'DOI ' . $doiValue . ' status ' . $doi->status);
+        $this->setResponse('responsecode', 'MT019');
+        $this->setResponse('verbosemessage', $doi->status);
 
         return true;
 

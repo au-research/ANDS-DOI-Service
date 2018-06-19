@@ -242,10 +242,10 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         // status is true
         $this->assertTrue($service->getStatus($doi));
 
-        $this->assertEquals("MT013", $service->getResponse()['responsecode']);
+        $this->assertEquals("MT019", $service->getResponse()['responsecode']);
 
         // should be active
-        $this->assertContains("status ACTIVE", $service->getResponse()['verbosemessage']);
+        $this->assertEquals("ACTIVE", $service->getResponse()['verbosemessage']);
 
         // deactivate it
         $result = $service->deactivate($doi);
@@ -255,10 +255,10 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         // status should still be true
         $this->assertTrue($service->getStatus($doi));
         
-        $this->assertEquals("MT013", $service->getResponse()['responsecode']);
+        $this->assertEquals("MT019", $service->getResponse()['responsecode']);
 
         // the response contains INACTIVE
-        $this->assertContains("status INACTIVE", $service->getResponse()['verbosemessage']);
+        $this->assertEquals("INACTIVE", $service->getResponse()['verbosemessage']);
 
     }
 

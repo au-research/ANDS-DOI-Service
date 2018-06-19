@@ -9,11 +9,6 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
 {
 
     private $repo;
-    /** @test */
-    public function it_should_be_able_to_get_a_client()
-    {
-        $this->assertNotNull($this->repo->getFirst());
-    }
 
     /** @test */
     public function it_should_be_able_to_get_a_client_via_id()
