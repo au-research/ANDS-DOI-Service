@@ -224,6 +224,47 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test * */
+    public function it_should_return_status_of_a_doi()
+    {
+        $service = $this->getServiceProvider();
+        $service->setAuthenticatedClient($this->getTestClient());
+
+        //mint a DOI and make sure it's activated
+        $result = $service->mint(
+            "https://devl.ands.org.au/minh/", $this->getTestXML(),false
+        );
+        $this->assertTrue($result);
+
+        $response = $service->getResponse();
+
+        $doi = $response['doi'];
+
+        // status is true
+        $this->assertTrue($service->getStatus($doi));
+
+        $this->assertEquals("MT013", $service->getResponse()['responsecode']);
+
+        // should be active
+        $this->assertContains("status ACTIVE", $service->getResponse()['verbosemessage']);
+
+        // deactivate it
+        $result = $service->deactivate($doi);
+
+
+
+        // status should still be true
+        $this->assertTrue($service->getStatus($doi));
+        
+        $this->assertEquals("MT013", $service->getResponse()['responsecode']);
+
+        // the response contains INACTIVE
+        $this->assertContains("status INACTIVE", $service->getResponse()['verbosemessage']);
+
+    }
+
+
+
+    /** @test * */
     public function it_should_allow_current_client_doi_access()
     {
         $service = $this->getServiceProvider();
