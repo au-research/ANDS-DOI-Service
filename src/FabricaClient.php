@@ -8,6 +8,7 @@
 
 namespace ANDS\DOI;
 use ANDS\DOI\Repository\ClientRepository;
+use ANDS\DOI\Model\Prefix as Prefix;
 use ANDS\DOI\Model\Client as TrustedClient;
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\ClientErrorResponseException;
@@ -262,6 +263,22 @@ class FabricaClient implements DataCiteClient
         return $result->json();
     }
 
+
+    public function syncUnallocatedPrefixes(){
+        $newPrefixes = [];
+        $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands','state'=>'without-client']])->send()->json();
+        foreach($result['data'] as $data){
+            $pValue = $data['relationships']['prefix']['data']['id'];
+            $prefix = Prefix::where(["prefix_value" => $pValue])->first();
+            if($prefix == null) {
+                $newPrefixes[] = $pValue;
+                $prefix = new Prefix(["prefix_value" => $pValue]);
+                $prefix->save();
+            }
+        }
+        return $newPrefixes;
+    }
+    
     public function getProviderPrefixes()
     {
         $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands']])->send();

@@ -40,6 +40,14 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         }
         $this->assertGreaterThan(2, sizeof($unAllocatedPrefixeArray));
     }
+
+
+    /** @test */
+    public function it_should_insert_all_unalocated_prefixes_in_db(){
+        $this->fabricaClient->syncUnallocatedPrefixes();
+    }
+
+
     
     /** @test */
     public function it_should_get_all_clients()
