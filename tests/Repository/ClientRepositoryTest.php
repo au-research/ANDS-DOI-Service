@@ -114,7 +114,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
         $client = $this->createTestClient();
         $client->removeClientPrefixes();
         $client->addClientPrefix("10.4228", true);
-        $client->addClientPrefixes("10.4228,  10.4227,10.4226 ");
+        $client->addClientPrefixes("10.4228,  10.4227, 10.4226 ");
     }
 
     /** @test **/

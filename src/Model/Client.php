@@ -79,6 +79,11 @@ class Client extends Model
         );
     }
 
+    public function getActivePrefix()
+    {
+        return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->first();
+    }
+
     public function addClientPrefixes($prefixes){
         $prefixArray = explode(",", $prefixes);
         foreach ($prefixArray as $p){
@@ -122,11 +127,7 @@ class Client extends Model
             $prefix = new Prefix(["prefix_value" => $prefix_value]);
             $prefix->save();
         }
-
         $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active]));
-
-
-
     }
 
     public function removeClientPrefix($prefix_value){

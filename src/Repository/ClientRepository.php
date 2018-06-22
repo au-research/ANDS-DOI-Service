@@ -127,11 +127,19 @@ class ClientRepository
      */
     public function getUnalocatedPrefixes()
     {
-        $usedPrefixIds = ClientPrefixes::select('prefix_id')->where('active', true)->get();
+        $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
         $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->get();
         return $prefixes;
     }
 
+    /**
+     * @return Prefix
+     */
+    public function getOneUnallocatedPrefix()
+    {
+        $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
+        return Prefix::whereNotIn('id', $usedPrefixIds)->first();
+    }
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *

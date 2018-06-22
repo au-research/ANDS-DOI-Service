@@ -22,6 +22,7 @@ class FabricaClient implements DataCiteClient
 
     private $errors = array();
     private $messages = array();
+    public $responseCode;
     private $clientRepository;
 
     /** @var GuzzleClient */
@@ -197,6 +198,7 @@ class FabricaClient implements DataCiteClient
 
         try {
             $response = $request->send();
+            $this->responseCode = $response->getStatusCode();
         } catch (ClientErrorResponseException $e) {
             $this->errors = $e->getResponse()->json();
         }
@@ -215,6 +217,7 @@ class FabricaClient implements DataCiteClient
         $request = $this->http->patch('/clients/'.$client->datacite_symbol, $headers, $clientInfo);
         try {
             $response = $request->send();
+            $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
             $this->errors[] = $e->getResponse()->json();
@@ -223,6 +226,30 @@ class FabricaClient implements DataCiteClient
             $this->errors[] = $e->getMessage();
         }
         $this->messages[] = $response;
+    }
+
+    public function updateClientPrefixes(TrustedClient $client)
+    {
+        $clientInfo = $this->getClientPrefixInfo($client);
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
+        ];
+        $response = "";
+        $request = $this->http->post('/client-prefixes', $headers, $clientInfo);
+        try {
+            $response = $request->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+
     }
 
     public function deleteClient(TrustedClient $client)
@@ -235,6 +262,7 @@ class FabricaClient implements DataCiteClient
         ];
         try {
             $response = $this->http->delete('/clients/'.$client->datacite_symbol, $headers)->send();
+            $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
             $this->errors[] = $e->getResponse()->json();
@@ -247,26 +275,59 @@ class FabricaClient implements DataCiteClient
     
     public function getClientByDataCiteSymbol($datacite_symbol)
     {
-        $result = [];
+        $response = "";
         try{
-            $result = $this->http->get("/clients/$datacite_symbol")->send();
+            $response = $this->http->get("/clients/$datacite_symbol")->send();
+            $this->responseCode = $response->getStatusCode();
         }
-        catch(Exception $e){
-            print($e->getMessage());
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
         }
-        return $result->json();
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
     }
 
+    public function getClientPrefixesByDataciteSymbol($datacite_symbol){
+        $response = "";
+        try{
+            $response = $this->http->get("/client-prefixes?client-id=".$datacite_symbol)->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
+    }
+    
+    
     public function getClients()
-    {
-        $result = $this->http->get('/clients', [], ["query" => ['provider-id'=>'ands']])->send();
-        return $result->json();
+    {       
+        $response = "";
+        try{
+            $response = $this->http->get('/clients', [], ["query" => ['provider-id'=>'ands']])->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
     }
 
 
     public function syncUnallocatedPrefixes(){
         $newPrefixes = [];
-        $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands','state'=>'without-client']])->send()->json();
+        $result = $this->getUnalocatedPrefixes();
         foreach($result['data'] as $data){
             $pValue = $data['relationships']['prefix']['data']['id'];
             $prefix = Prefix::where(["prefix_value" => $pValue])->first();
@@ -281,29 +342,117 @@ class FabricaClient implements DataCiteClient
     
     public function getProviderPrefixes()
     {
-        $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands']])->send();
+        $response = "";
+        try {
+            $response = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands']])->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
 
-        return $result->json();
     }
 
     public function getClientPrefixes(TrustedClient $client)
     {
-        $result = $this->http->get('/provider-prefixes',[], ["query" =>
+        try {
+            $response = $this->http->get('/provider-prefixes',[], ["query" =>
             ['client_id'=>$client->datacite_symbol,
             'provider-id'=>'ands']])->send();
-        return $result->json();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
     }
+
+    private function claimUnassignedPrefix($prefix_value){
+        $prefixInfo = $this->getPrefixInfo($prefix_value);
+
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
+        ];
+        $response = "";
+        try {
+            $response = $this->http->post('/provider-prefixes', $headers, $prefixInfo)->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+    }
+
+    public function claimNumberOfUnassignedPrefixes($count = 3){
+        $unallocatedPrefixes = $this->getUnAssignedPrefixes();
+        $newPrefixes = [];
+        foreach($unallocatedPrefixes['data'] as $prefix)
+        {
+            $this->claimUnassignedPrefix($prefix['id']);
+            $newPrefixes[] = $prefix['id'];
+            if(sizeof($this->errors) || --$count == 0);
+                break;
+        }
+        return $newPrefixes;
+    }
+    /*
+     *
+     Unassigned Prefix means that a Prefix is not given to any Allocator (eg ANDS) on DataCite
+     *
+     */
 
     public function getUnAssignedPrefixes()
     {
-        $result = $this->http->get('/prefixes',[], ["query" => ['state'=>'unassigned']])->send();
-        return $result->json();
+        $response = "";
+        try {
+            $response = $this->http->get('/prefixes',[], ["query" => ['state'=>'unassigned']])->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
     }
 
+    /*
+     *
+     UnAllocated Prefix means that a Prefix is taken by ANDS but not assigned to datacenters eg one of our trusted client
+     *
+     */
     public function getUnalocatedPrefixes()
     {
-        $result = $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands','state'=>'without-client']])->send();
-        return $result->json();
+        $response = "";
+        try {
+            $response =  $this->http->get('/provider-prefixes',[], ["query" => ['provider-id'=>'ands','state'=>'without-client']])->send();
+            $this->responseCode = $response->getStatusCode();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getResponse()->json();
+        }
+        catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+        $this->messages[] = $response;
+        return $response->json();
     }
 
     /**
@@ -328,6 +477,32 @@ class FabricaClient implements DataCiteClient
         return json_encode($clientInfo);
     }
 
+    /**
+     * @param TrustedClient $client
+     * @return string
+     */
+    public function getClientPrefixInfo(TrustedClient $tClient)
+    {
+        $attributes = ["created" => null];
+        $client = ["data" => ["type" => "clients",
+            "id" => strtolower($tClient->datacite_symbol)]];
+        $prefix = $this->getActivePrefix($tClient);
+        $relationships = ["client" => $client, "prefix" => $prefix];
+        $clientInfo = ["data" => ["attributes" => $attributes, "relationships" => $relationships, "type" => "client-prefixes"]];
+        return json_encode($clientInfo);
+    }
+
+
+    public function getPrefixInfo($prefix_value){
+        $attributes = ["created" => null,];
+        $provider = ["data" => ["type" => "providers", "id" => "ands"]];
+        $prefix = ["data" => ["type" => "prefixes", "id" => $prefix_value]];
+        $relationships = ["provider" => $provider, "prefix" => $prefix];
+        $prefixInfo = ["data" => ["attributes" => $attributes, "relationships" => $relationships, "type" => "provider-prefixes"]];
+        return json_encode($prefixInfo);
+    }
+
+    
     public function getClientDomains(TrustedClient $client){
         $domains_str = "";
         $first = true;
@@ -344,8 +519,15 @@ class FabricaClient implements DataCiteClient
         $prefixes = array();
         foreach ($client->prefixes as $clientPrefix) {
                 $prefixes[] = array("id" => trim($clientPrefix->prefix->prefix_value, "/"),
-                    "type" => "prefix");
+                    "type" => "prefixes");
         }
         return array("data" => $prefixes);
+    }
+
+    public function getActivePrefix(TrustedClient $client){
+        foreach ($client->prefixes as $clientPrefix) {
+            if($clientPrefix->active)
+                return array("data" => array("type" => "prefixes","id" => $clientPrefix->prefix->prefix_value));
+        }
     }
 }

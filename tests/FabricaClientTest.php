@@ -26,14 +26,24 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_get_all_UnAssigned_prefixes(){
         $unAssignedPrefixes = $this->fabricaClient->getUnAssignedPrefixes();
-        //var_dump(sizeof($unAssignedPrefixes['data']));
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
         $this->assertGreaterThan(24, sizeof($unAssignedPrefixes['data']));
+
+    }
+
+    /** @test */
+    public function it_should_get_more_from_unassigned_prefixes(){
+        $cc = 1;
+        $unAssignedPrefixes = $this->fabricaClient->claimNumberOfUnassignedPrefixes($cc);
+        $this->assertEquals(201, $this->fabricaClient->responseCode);
+        $this->assertEquals($cc, sizeof($unAssignedPrefixes));
 
     }
 
     /** @test */
     public function it_should_get_all_Unalocated_prefixes(){
         $unAllocatedPrefixes = $this->fabricaClient->getUnalocatedPrefixes();
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
         $unAllocatedPrefixeArray = [];
         foreach($unAllocatedPrefixes['data'] as $data){
             $unAllocatedPrefixeArray[] = $data['relationships']['prefix']['data']['id'];
@@ -43,24 +53,67 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 
 
     /** @test */
-    public function it_should_insert_all_unalocated_prefixes_in_db(){
-        $this->fabricaClient->syncUnallocatedPrefixes();
+    public function it_should_get_all_provider_prefixes(){
+        $providerPrefixes = $this->fabricaClient->getProviderPrefixes();
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
+        $providerPrefixesArray = [];
+        foreach($providerPrefixes['data'] as $data){
+            $providerPrefixesArray[] = $data['relationships']['prefix']['data']['id'];
+        }
+        $this->assertGreaterThan(2, sizeof($providerPrefixes));
     }
 
 
+    /** @test */
+    public function it_should_claim_1_and_sync_unalocated_prefixes_in_db(){
+        $cc = 1;
+        $oldUnalloc = $this->repo->getUnalocatedPrefixes();
+        
+        $unAssignedPrefixes = $this->fabricaClient->claimNumberOfUnassignedPrefixes($cc);
+        $this->assertEquals(201, $this->fabricaClient->responseCode);
+        $this->assertEquals($cc, sizeof($unAssignedPrefixes));
+        $this->fabricaClient->syncUnallocatedPrefixes();
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
+        $newUnalloc = $this->repo->getUnalocatedPrefixes();
+        $this->assertGreaterThan(sizeof($oldUnalloc), sizeof($newUnalloc));
+    }
     
     /** @test */
     public function it_should_get_all_clients()
     {
         $clients = $this->fabricaClient->getClients();
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
         $this->assertGreaterThan(10, sizeof($clients['data']));
+    }
+    /** @test */
+    public function it_should_assign_a_non_assigned_prefix_to_a_client()
+    {
+        $unAllocatedPrefix = $this->repo->getOneUnallocatedPrefix();
+        if($unAllocatedPrefix){
+            $newPrefix = $unAllocatedPrefix->prefix_value;
+            $this->trustedClient->addClientPrefix($newPrefix);
+            $this->fabricaClient->updateClientPrefixes($this->trustedClient);
+            $fabricaInfo = $this->fabricaClient->getClientPrefixesByDataciteSymbol($this->trustedClient->datacite_symbol);
+            $this->assertEquals(200, $this->fabricaClient->responseCode);
+            $this->assertContains($newPrefix, json_encode($fabricaInfo));
+        }
+    }
+
+    /** @test */
+    public function it_should_get_prefix_info_from_dataite_for_a_client()
+    {
+        $fabricaInfo = $this->fabricaClient->getClientPrefixesByDataciteSymbol($this->trustedClient->datacite_symbol);
+        $this->assertContains("prefixes", json_encode($fabricaInfo));
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
+
     }
 
     /** @test  **/
     public function it_should_find_client_by_symbol_remote()
     {
-        $trustedCient = $this->fabricaClient->getClientByDataCiteSymbol("ANDS.CENTRE82");
-        $this->assertEquals("ands.centre82", $trustedCient['data']['id']);
+        $trustedCient = $this->fabricaClient->getClientByDataCiteSymbol($this->trustedClient->datacite_symbol);
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
+        $this->assertEquals("ands.ct8", $trustedCient['data']['id']);
     }
 
 
@@ -68,9 +121,10 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 //    public function it_should_add_a_new_client_to_datacite()
 //    {
 //        $this->fabricaClient->addClient($this->trustedClient);
+//        $this->assertEquals(201, $this->fabricaClient->responseCode);
 //        $this->assertFalse($this->fabricaClient->hasError());
 //    }
-
+// WE SHOULD'T DELETE CLIENTS ON DATACITE (IT WORKS THOUGH)
 //    /** @test **/
 //    public function it_should_delete_a_client_on_datacite(){
 //        var_dump($this->trustedClient->datacite_symbol);
@@ -91,13 +145,23 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 
         $this->fabricaClient->updateClient($this->trustedClient);
         $this->assertFalse($this->fabricaClient->hasError());
+        $params = [
+            'client_id' => $this->trustedClient->client_id,
+            'client_name' => $this->trustedClientName,
+            'client_contact_name' => $this->trustedClientName,
+        ];
+
+        $this->trustedClient = $this->repo->updateClient($params);
+
+        $this->fabricaClient->updateClient($this->trustedClient);
+        $this->assertFalse($this->fabricaClient->hasError());
     }
 
     /** @test  **/
     public function it_should_create_clientInfo_from_local_client_object()
     {
         $clientInfo = $this->fabricaClient->getClientInfo($this->trustedClient);
-        $this->assertContains("ANDS.CTEST1", $clientInfo);
+        $this->assertContains($this->trustedClient->datacite_symbol, $clientInfo);
     }
 
     /**
@@ -126,17 +190,19 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     private function getTestClient(){
 
         $this->trustedClientName = getenv("TEST_DC_CLIENT");
+        $this->trustedClient_AppId = $this->trustedClientName."APP_ID";
         $this->trustedClient = $this->repo->getByAppID($this->trustedClient_AppId);
         $this->trustedClient_symbol = getenv("TEST_DC_CLIENT_DATACITE_SYMBOL");
         if($this->trustedClient == null) {
             $params = [
                 'ip_address' => "8.8.8.8",
-                'app_id' => $this->trustedClientName."APP_ID",
+                'app_id' => $this->trustedClient_AppId,
                 'client_name' => urldecode($this->trustedClientName),
                 'client_contact_name' => urldecode($this->trustedClientName),
                 'client_contact_email' => urldecode($this->trustedClientName.".@ands.org.au"),
                 'shared_secret' => $this->trustedClientName,"SHARED_SECRET"
             ];
+            var_dump("add_new_client");
             $this->trustedClient = $this->repo->create($params);
         }
         $this->trustedClient->datacite_symbol = getenv("TEST_DC_CLIENT_DATACITE_SYMBOL");
@@ -161,12 +227,12 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->getTestClient();
     }
 
-    /**
-     *
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-        $this->removeTestClient();
-    }
+//    /**
+//     *
+//     */
+//    public function tearDown()
+//    {
+//        parent::tearDown();
+//        $this->removeTestClient();
+//    }
 }
