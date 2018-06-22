@@ -23,6 +23,7 @@ class FabricaClient implements DataCiteClient
     private $errors = array();
     private $messages = array();
     public $responseCode;
+    /** @var  ClientRepository */
     private $clientRepository;
 
     /** @var GuzzleClient */
@@ -329,17 +330,32 @@ class FabricaClient implements DataCiteClient
         $newPrefixes = [];
         $result = $this->getUnalocatedPrefixes();
         foreach($result['data'] as $data){
+
             $pValue = $data['relationships']['prefix']['data']['id'];
-            $prefix = Prefix::where(["prefix_value" => $pValue])->first();
-            if($prefix == null) {
+                $newPrefix = array("prefix_value" => $pValue,
+                    "datacite_id" => $data['id'],
+                    "created" => $data['attributes']['created']);
+                $this->clientRepository->addOrUpdatePrefix($newPrefix);
                 $newPrefixes[] = $pValue;
-                $prefix = new Prefix(["prefix_value" => $pValue]);
-                $prefix->save();
-            }
         }
         return $newPrefixes;
     }
-    
+
+    public function syncProviderPrefixes(){
+        $newPrefixes = [];
+        $result = $this->getProviderPrefixes();
+        foreach($result['data'] as $data){
+
+            $pValue = $data['relationships']['prefix']['data']['id'];
+            $newPrefix = array("prefix_value" => $pValue,
+                "datacite_id" => $data['id'],
+                "created" => $data['attributes']['created']);
+            $this->clientRepository->addOrUpdatePrefix($newPrefix);
+            $newPrefixes[] = $pValue;
+        }
+        return $newPrefixes;
+    }
+
     public function getProviderPrefixes()
     {
         $response = "";
@@ -387,7 +403,14 @@ class FabricaClient implements DataCiteClient
         $response = "";
         try {
             $response = $this->http->post('/provider-prefixes', $headers, $prefixInfo)->send();
+            $result = $response->json();
             $this->responseCode = $response->getStatusCode();
+            if($this->responseCode == 201){
+                $newPrefix = array("prefix_value" => $prefix_value,
+                    "datacite_id" => $result['data']['id'],
+                    "created" => $result['data']['attributes']['created']);
+                $this->clientRepository->addOrUpdatePrefix($newPrefix);
+            }
         }
         catch (ClientErrorResponseException $e) {
             $this->errors[] = $e->getResponse()->json();
@@ -396,15 +419,18 @@ class FabricaClient implements DataCiteClient
             $this->errors[] = $e->getMessage();
         }
         $this->messages[] = $response;
+        return $prefix_value;
     }
+
+
+
 
     public function claimNumberOfUnassignedPrefixes($count = 3){
         $unallocatedPrefixes = $this->getUnAssignedPrefixes();
         $newPrefixes = [];
         foreach($unallocatedPrefixes['data'] as $prefix)
         {
-            $this->claimUnassignedPrefix($prefix['id']);
-            $newPrefixes[] = $prefix['id'];
+            $newPrefixes[] = $this->claimUnassignedPrefix($prefix['id']);
             if(sizeof($this->errors) || --$count == 0);
                 break;
         }

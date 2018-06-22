@@ -63,6 +63,19 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(2, sizeof($providerPrefixes));
     }
 
+    /** @test */
+    public function it_should_sync_unallocated_prefixes()
+    {
+        $resultArray = $this->fabricaClient->syncUnallocatedPrefixes();
+        $this->assertGreaterThan(2, sizeof($resultArray));
+    }
+
+    /** @test */
+    public function it_should_sync_all_provider_prefixes()
+    {
+        $resultArray = $this->fabricaClient->syncProviderPrefixes();
+        $this->assertGreaterThan(2, sizeof($resultArray));
+    }
 
     /** @test */
     public function it_should_claim_1_and_sync_unalocated_prefixes_in_db(){

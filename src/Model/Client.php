@@ -131,12 +131,13 @@ class Client extends Model
         }
         catch(Exception $e)
         {}
-
+        // should never happen since all prefixed must be preloaded
         if($prefix == null)// create a new prefix and assign it to the Client
         {
             $prefix = new Prefix(["prefix_value" => $prefix_value]);
             $prefix->save();
         }
+
         $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active]));
     }
 

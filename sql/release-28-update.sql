@@ -11,9 +11,13 @@ CREATE TABLE `doi_client_prefixes` (
   KEY `doi_client_prefixes_index` (`client_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+DROP TABLE `prefixes`;
+
 CREATE TABLE `prefixes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `prefix_value` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `datacite_id` VARCHAR(45),
+  `created` DATETIME NOT NULL DEFAULT now()
   PRIMARY KEY (`id`),
   KEY `prefixes_index` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

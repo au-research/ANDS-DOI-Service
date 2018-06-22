@@ -140,6 +140,15 @@ class ClientRepository
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
         return Prefix::whereNotIn('id', $usedPrefixIds)->first();
     }
+    
+    public function addOrUpdatePrefix($pPrefix){
+        $prefix = Prefix::where("prefix_value", $pPrefix['prefix_value'])->first();
+        if($prefix)
+            $prefix->update($pPrefix);
+        else
+            $prefix = new Prefix($pPrefix);
+        $prefix->save();
+    }
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *
