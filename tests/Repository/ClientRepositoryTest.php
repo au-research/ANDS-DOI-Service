@@ -113,8 +113,13 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $client = $this->createTestClient();
         $client->removeClientPrefixes();
+        $this->assertFalse($client->hasPrefix("10.4228"));
         $client->addClientPrefix("10.4228", true);
-        $client->addClientPrefixes("10.4228,  10.4227, 10.4226 ");
+        $this->assertTrue($client->hasPrefix("10.4228"));
+        $client->addClientPrefixes("10.4227, 10.4226 ");
+        $this->assertTrue($client->hasPrefix("10.4227"));
+        $this->assertTrue($client->hasPrefix("10.4226"));
+
     }
 
     /** @test **/
@@ -147,12 +152,6 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
 
 
         $client = $this->repo->getByAppID("PHPUNIT_TEST_APP_ID");
-        $this->assertEquals("PHPUNIT_TEST", $client->client_name);
-        $this->assertEquals("PHPUNIT_TEST", $client->client_contact_name);
-        $this->assertEquals("8.8.8.8", $client->ip_address);
-        $this->assertEquals("PHPUNIT_TEST@PHPUNIT_TEST", $client->client_contact_email);
-        $this->assertEquals("PHPUNIT_TEST_SHARED_SECRET", $client->shared_secret);
-
         $params = [
             'client_id' => $client->client_id,
             'ip_address' => "UPDATED",
@@ -233,6 +232,6 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         parent::tearDown();
-        $this->removeTestClient();
+       // $this->removeTestClient();
     }
 }

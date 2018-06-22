@@ -90,6 +90,16 @@ class Client extends Model
             $this->addClientPrefix($p);
         }
     }
+
+    public function hasPrefix($prefix_value){
+        $clientPrefixes = ClientPrefixes::where("client_id", $this->client_id)->get();
+        foreach ($clientPrefixes as $clientPrefix) {
+            if($prefix_value ==  $clientPrefix->prefix->prefix_value)
+                return true;
+        }
+        return false;
+    }
+
     /** add prefix to client */
 
     public function addClientPrefix($prefix_value, $active = true){
