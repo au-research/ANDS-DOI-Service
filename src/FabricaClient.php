@@ -177,6 +177,25 @@ class FabricaClient implements DataCiteClient
     }
 
     /**
+     * @return String
+     */
+    public function getErrorMessage()
+    {
+        $errorMsg = "";
+        if(sizeof($this->errors) > 0){
+            foreach ($this->errors as $e){
+                foreach ($e as $message)
+                {
+                    $errorMsg .= isset($message[0]['source']) ? $message[0]['source']." : " : "";
+                    $errorMsg .= isset($message[0]['status']) ? $message[0]['status']." : " : "";
+                    $errorMsg .= isset($message[0]['title']) ? $message[0]['title'] : " ";
+                }
+            }
+        }
+        return $errorMsg;
+    }
+
+    /**
      * @return bool
      */
     public function hasError()
@@ -232,6 +251,10 @@ class FabricaClient implements DataCiteClient
     public function updateClientPrefixes(TrustedClient $client)
     {
         $clientInfo = $this->getClientPrefixInfo($client);
+        if(!$clientInfo){
+            $this->messages[] = "No Active Prefix assigned!";
+            return;
+        }
         $headers = [
             'Content-type' => 'application/json; charset=utf-8',
             'Accept' => 'application/json',
@@ -250,7 +273,6 @@ class FabricaClient implements DataCiteClient
             $this->errors[] = $e->getMessage();
         }
         $this->messages[] = $response;
-
     }
 
     public function deleteClient(TrustedClient $client)
@@ -431,7 +453,7 @@ class FabricaClient implements DataCiteClient
         foreach($unallocatedPrefixes['data'] as $prefix)
         {
             $newPrefixes[] = $this->claimUnassignedPrefix($prefix['id']);
-            if(sizeof($this->errors) || --$count == 0);
+            if(--$count == 0)
                 break;
         }
         return $newPrefixes;
@@ -513,6 +535,9 @@ class FabricaClient implements DataCiteClient
         $client = ["data" => ["type" => "clients",
             "id" => strtolower($tClient->datacite_symbol)]];
         $prefix = $this->getActivePrefix($tClient);
+        if(!$prefix){
+            return false;
+        }
         $relationships = ["client" => $client, "prefix" => $prefix];
         $clientInfo = ["data" => ["attributes" => $attributes, "relationships" => $relationships, "type" => "client-prefixes"]];
         return json_encode($clientInfo);

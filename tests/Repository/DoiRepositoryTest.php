@@ -24,6 +24,7 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         // mint a DOI, make sure it exists in the database
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
+
         $result = $service->mint(
             "https://devl.ands.org.au/minh/", $this->getTestXML()
         );
