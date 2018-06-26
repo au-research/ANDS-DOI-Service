@@ -32,6 +32,9 @@ select doi_client.client_id , prefixes.id
 from doi_client, prefixes
 where doi_client.datacite_prefix = prefixes.prefix_value;
 
+-- we shopuld drop column as well (but we can leave it for now)
+-- ALTER TABLE `doi_client` DROP COLUMN `datacite_prefix`;
+
 
 -- select * from prefixes;
 

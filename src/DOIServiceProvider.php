@@ -163,14 +163,13 @@ class DOIServiceProvider
             $doiValue = XMLValidator::getDOIValue($xml);
         }else{
             $doiValue = $this->getNewDOI();
+            // replaced doiValue
+            $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
         }
+
         $this->setResponse('doi', $doiValue);
 
         // validation on the DOIValue
-
-        // replaced doiValue
-        $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
-
         // Validate xml
         if($this->validateXML($xml) === false){
             $this->setResponse('responsecode', 'MT006');
@@ -214,25 +213,30 @@ class DOIServiceProvider
 
     /**
      * Returns a new DOI for the currently existing authenticated client
+     * if client has no active prefix it probably means it's a test client
      *
      * @return string
      */
     public function getNewDOI()
     {
         // get the first active prefix for this authenticated client
-        $activeClientPrefix = $this->getAuthenticatedClient()->prefixes->filter(function($prefix){
-            return $prefix->active;
-        })->first()->prefix;
-        $prefix = $activeClientPrefix->prefix_value;
+        $prefix = "10.5072";
+
+        $client = $this->getAuthenticatedClient();
+        if(sizeof($client->prefixes) > 0){
+            foreach ($client->prefixes as $clientPrefix) {
+                if($clientPrefix->active) {
+                    $prefix = $clientPrefix->prefix->prefix_value;
+                    break;
+                }
+            }
+        }
 
         $prefix = ends_with($prefix, '/') ? $prefix : $prefix .'/';
         
         // set to test prefix if  authenticated client is a test DOI APP ID
-        if (substr($this->getAuthenticatedClient()->app_id, 0, 4) == 'TEST') {
-            $prefix = "10.5072/";
-        }
 
-        $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
+        $testStr = $prefix == '10.5072/' ? "TEST_DOI_" : "";
 
         $doiValue = uniqid();
 
