@@ -196,7 +196,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         ));
 
-        $this->fabricaClient->setDataciteUrl(getenv("DATACITE_FABRICA_URL"));
+        $this->fabricaClient->setDataciteUrl(getenv("DATACITE_FABRICA_API_URL"));
         $this->repo = $this->fabricaClient->getClientRepository();
 
     }
