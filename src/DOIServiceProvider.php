@@ -113,9 +113,17 @@ class DOIServiceProvider
      *
      * @return bool
      */
-    public function isDoiAuthenticatedClients($doiValue)
-    {
+    public function isDoiAuthenticatedClients($doiValue, $client_id = null)
+        {
+
         $client = $this->getAuthenticatedClient();
+
+        if($client_id === null)
+            return false;
+
+        if($client->client_id != $client_id)
+            return false;
+
         foreach ($client->prefixes as $clientPrefix) {
             if(strpos($doiValue, $clientPrefix->prefix->prefix_value) === 0)
                 return true;
@@ -281,7 +289,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
@@ -364,7 +372,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
@@ -418,7 +426,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage', $doiValue . " is not owned by " . $this->getAuthenticatedClient()->client_name);
             return false;
@@ -457,7 +465,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;

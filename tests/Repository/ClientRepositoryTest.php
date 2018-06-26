@@ -153,21 +153,17 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
 
         $client = $this->repo->getByAppID("PHPUNIT_TEST_APP_ID");
         $params = [
-            'client_id' => $client->client_id,
-            'ip_address' => "UPDATED",
+            'client_id' => urldecode($client->client_id),
             'client_name' => urldecode("UPDATED"),
             'client_contact_name' => urldecode("UPDATED"),
             'client_contact_email' => urldecode("UPDATED"),
-            'shared_secret' => "UPDATED"
         ];
 
         $this->repo->updateClient($params);
         $client = $this->repo->getByAppID("PHPUNIT_TEST_APP_ID");
         $this->assertEquals("UPDATED", $client->client_name);
         $this->assertEquals("UPDATED", $client->client_contact_name);
-        $this->assertEquals("UPDATED", $client->ip_address);
         $this->assertEquals("UPDATED", $client->client_contact_email);
-        $this->assertEquals("UPDATED", $client->shared_secret);
     }
 
     /** @test  **/

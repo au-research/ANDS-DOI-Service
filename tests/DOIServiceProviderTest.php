@@ -233,6 +233,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint(
             "https://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
+
         $this->assertTrue($result);
 
         $response = $service->getResponse();
@@ -268,8 +269,10 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
     public function it_should_allow_current_client_doi_access()
     {
         $service = $this->getServiceProvider();
-        $service->setAuthenticatedClient($this->getTestClient());
-        $this->assertTrue($service->isDoiAuthenticatedClients($this->testDoiId));
+        $client = $this->getTestClient();
+        $service->setAuthenticatedClient($client);
+
+        $this->assertTrue($service->isDoiAuthenticatedClients($this->testDoiId, $client->client_id));
 
     }
 
