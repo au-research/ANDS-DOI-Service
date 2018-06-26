@@ -106,7 +106,7 @@ class Client extends Model
 
         $prefix = null;
         $prefix_value = trim($prefix_value);
-        if($prefix_value == '')
+        if($prefix_value == null || $prefix_value == '')
             return;
 
         //set all other prefixes for this client as non active if this prefix is the active one
