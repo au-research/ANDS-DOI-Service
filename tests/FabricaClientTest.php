@@ -101,19 +101,20 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(200, $this->fabricaClient->responseCode);
         $this->assertGreaterThan(10, sizeof($clients['data']));
     }
-//    /** @test */
-//    public function it_should_assign_a_non_assigned_prefix_to_a_client()
-//    {
-//        $unAllocatedPrefix = $this->repo->getOneUnallocatedPrefix();
-//        if($unAllocatedPrefix){
-//            $newPrefix = $unAllocatedPrefix->prefix_value;
-//            $this->trustedClient->addClientPrefix($newPrefix);
-//            $this->fabricaClient->updateClientPrefixes($this->trustedClient);
-//            $fabricaInfo = $this->fabricaClient->getClientPrefixesByDataciteSymbol($this->trustedClient->datacite_symbol);
-//            $this->assertEquals(200, $this->fabricaClient->responseCode);
-//            $this->assertContains($newPrefix, json_encode($fabricaInfo));
-//        }
-//    }
+    
+    /** @test */
+    public function it_should_assign_a_non_assigned_prefix_to_a_client()
+    {
+        $unAllocatedPrefix = $this->repo->getOneUnallocatedPrefix();
+        if($unAllocatedPrefix){
+            $newPrefix = $unAllocatedPrefix->prefix_value;
+            $this->trustedClient->addClientPrefix($newPrefix);
+            $this->fabricaClient->updateClientPrefixes($this->trustedClient);
+            $fabricaInfo = $this->fabricaClient->getClientPrefixesByDataciteSymbol($this->trustedClient->datacite_symbol);
+            $this->assertEquals(200, $this->fabricaClient->responseCode);
+            $this->assertContains($newPrefix, json_encode($fabricaInfo));
+        }
+    }
 
     /** @test */
     public function it_should_get_prefix_info_from_dataite_for_a_client()
