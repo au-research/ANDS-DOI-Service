@@ -12,6 +12,8 @@ use ANDS\DOI\Model\Prefix as Prefix;
 use ANDS\DOI\Model\Client as TrustedClient;
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\ClientErrorResponseException;
+use Guzzle\Http\Exception\ServerErrorResponseException;
+
 
 class FabricaClient implements DataCiteClient
 {
@@ -184,12 +186,17 @@ class FabricaClient implements DataCiteClient
         $errorMsg = "";
         if(sizeof($this->errors) > 0){
             foreach ($this->errors as $e){
-                foreach ($e as $message)
-                {
-                    $errorMsg .= isset($message[0]['source']) ? $message[0]['source']." : " : "";
-                    $errorMsg .= isset($message[0]['status']) ? $message[0]['status']." : " : "";
-                    $errorMsg .= isset($message[0]['title']) ? $message[0]['title'] : " ";
+                if(is_array($e)){
+                    foreach ($e as $message)
+                    {
+                        $errorMsg .= isset($message[0]['source']) ? $message[0]['source']." : " : "";
+                        $errorMsg .= isset($message[0]['status']) ? $message[0]['status']." : " : "";
+                        $errorMsg .= isset($message[0]['title']) ? $message[0]['title'] : " ";
+                    }
+                }else{
+                    $errorMsg = $e;
                 }
+
             }
         }
         return $errorMsg;
@@ -219,8 +226,14 @@ class FabricaClient implements DataCiteClient
         try {
             $response = $request->send();
             $this->responseCode = $response->getStatusCode();
-        } catch (ClientErrorResponseException $e) {
+        }
+        catch (ClientErrorResponseException $e) {
             $this->errors = $e->getResponse()->json();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getResponse()->json();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
     }
@@ -240,16 +253,19 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
     }
 
     public function updateClientPrefixes(TrustedClient $client)
     {
+
         $clientInfo = $this->getClientPrefixInfo($client);
         if(!$clientInfo){
             $this->messages[] = "No Active Prefix assigned!";
@@ -261,16 +277,20 @@ class FabricaClient implements DataCiteClient
             'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
         ];
         $response = "";
+
         $request = $this->http->post('/client-prefixes', $headers, $clientInfo);
+
         try {
             $response = $request->send();
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
     }
@@ -288,10 +308,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
     }
@@ -304,10 +326,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -320,10 +344,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -338,10 +364,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -386,10 +414,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -405,10 +435,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -435,10 +467,12 @@ class FabricaClient implements DataCiteClient
             }
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $prefix_value;
@@ -472,10 +506,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
@@ -494,10 +530,12 @@ class FabricaClient implements DataCiteClient
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
-            $this->errors[] = $e->getResponse()->json();
-        }
-        catch (Exception $e) {
             $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
         }
         $this->messages[] = $response;
         return $response->json();
