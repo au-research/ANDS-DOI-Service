@@ -210,7 +210,15 @@ class FabricaClient implements DataCiteClient
         return count($this->getErrors()) > 0 ? true : false;
     }
 
-
+    /**
+     * @return bool
+     */
+    public function clearMessages()
+    {
+        $this->responseCode = 0;
+        $this->errors = [];
+        $this->messages = [];
+    }
 
     public function addClient(TrustedClient $client)
     {

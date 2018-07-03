@@ -125,20 +125,22 @@ class ClientRepository
     /**
      * @return mixed
      */
-    public function getUnalocatedPrefixes()
+    public function getUnalocatedPrefixes($excluding = [])
     {
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
-        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->get();
+        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->get();
         return $prefixes;
     }
 
     /**
+     * param excluded list of prefixes
      * @return Prefix
      */
-    public function getOneUnallocatedPrefix()
+    public function getOneUnallocatedPrefix($excluding = [])
     {
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
-        return Prefix::whereNotIn('id', $usedPrefixIds)->first();
+        return Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->first();
+
     }
     
     public function addOrUpdatePrefix($pPrefix){
