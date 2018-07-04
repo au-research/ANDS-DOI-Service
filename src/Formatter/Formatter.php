@@ -122,6 +122,16 @@ class Formatter
                 $payload['type'] = "failure";
                 $payload['code'] = 200;
                 break;
+            case "MT018":
+                $payload['message'] = "No metadata exists for the requested DOI. Metadata must be registered before the DOI can be minted.";
+                $payload['type'] = 'failure';
+                $payload['code'] = 400;
+                break;
+            case "MT019":
+                $payload['message'] = $payload['verbosemessage'];
+                $payload['type'] = 'success';
+                $payload['code'] = 200;
+                break;
             case "MT090":
                 // Success response for status pings (verbose message should indicate ms turnaround time)
                 $payload['message'] = "The rocket is ready to blast off -- all systems are go!";
