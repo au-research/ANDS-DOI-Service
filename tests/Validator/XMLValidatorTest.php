@@ -60,10 +60,11 @@ class XMLValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(XMLValidator::create()->validateSchemaVersion($xml));
     }
 
-    public function setUp()
+    /** @test **/
+    public function it_should_validate_schema_version_4_1()
     {
-        $dotenv = new Dotenv('./');
-        $dotenv->load();
+        $xml = file_get_contents(__DIR__.'/../assets/datacite-example-full-v4.1.xml');
+        $this->assertTrue(XMLValidator::create()->validateSchemaVersion($xml));
     }
 
 }
