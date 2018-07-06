@@ -211,7 +211,8 @@ class FabricaClient implements DataCiteClient
     }
 
     /**
-     * @return bool
+     * clears messages
+     * this function should be called after each request to avoid messages to be combined
      */
     public function clearMessages()
     {
@@ -220,8 +221,13 @@ class FabricaClient implements DataCiteClient
         $this->messages = [];
     }
 
+    /**
+     * @param TrustedClient $client
+     * adds a new client to DataCite using a POST request
+     */
     public function addClient(TrustedClient $client)
     {
+        // clientinfo if fabrica's JSON representation of a client metadata
         $clientInfo = $this->getClientInfo($client);
         $headers = [
             'Content-type' => 'application/json; charset=utf-8',
@@ -246,6 +252,11 @@ class FabricaClient implements DataCiteClient
         $this->messages[] = $response;
     }
 
+    /*
+     * @param Trustedclient
+     * same as addclient but PATCH request to url containg the datasite_symbol if the client
+     *
+     */
     public function updateClient(TrustedClient $client)
     {
         $clientInfo = $this->getClientInfo($client);
@@ -271,10 +282,18 @@ class FabricaClient implements DataCiteClient
         $this->messages[] = $response;
     }
 
+    /**
+     * @param TrustedClient $client
+     * client prefixes added in a seperate request
+     * make sure the request is not called if prefix already given to the client at datacite
+     * or it will result a 500 error response
+     */
     public function updateClientPrefixes(TrustedClient $client)
     {
 
+        // a JSON representation of the client's prefix relationship
         $clientInfo = $this->getClientPrefixInfo($client);
+
         if(!$clientInfo){
             $this->messages[] = "No Active Prefix assigned!";
             return;
@@ -303,6 +322,12 @@ class FabricaClient implements DataCiteClient
         $this->messages[] = $response;
     }
 
+    /**
+     * @param TrustedClient $client
+     * a simple DELETE request containg the datacite-symbol of the client
+     * it was tested and it works but we shouldn't delete a client unless it was created in error
+     * datacite keeps client symbols (datacite's client's primary key) even after deletion.
+     */
     public function deleteClient(TrustedClient $client)
     {
         $response= "";
@@ -325,7 +350,13 @@ class FabricaClient implements DataCiteClient
         }
         $this->messages[] = $response;
     }
-    
+
+    /**
+     * @param $datacite_symbol
+     * @return array|bool|float|int|string
+     * we rely on our Database for this data
+     * this endpint is not used but tested and can be used to sync datacite information
+     */
     public function getClientByDataCiteSymbol($datacite_symbol)
     {
         $response = "";
@@ -345,6 +376,12 @@ class FabricaClient implements DataCiteClient
         return $response->json();
     }
 
+    /**
+     * @param $datacite_symbol
+     * @return array|bool|float|int|string
+     * we rely on our Database for this data
+     * not used but can return the prefixes a trusted client is assigned to at datacite
+     */
     public function getClientPrefixesByDataciteSymbol($datacite_symbol){
         $response = "";
         try{
@@ -362,8 +399,13 @@ class FabricaClient implements DataCiteClient
         $this->messages[] = $response;
         return $response->json();
     }
-    
-    
+
+    /**
+     * @return array|bool|float|int|string
+     * return all of our clients and their details from datacite
+     * also not used
+     * we rely on our Database for this data
+     */
     public function getClients()
     {       
         $response = "";
@@ -383,7 +425,11 @@ class FabricaClient implements DataCiteClient
         return $response->json();
     }
 
-
+    /**
+     * @return array
+     * return prefixes assigned to ANDS that is not allocated to any clients
+     * is used in loading the available prefixes in our Database
+     */
     public function syncUnallocatedPrefixes(){
         $newPrefixes = [];
         $result = $this->getUnalocatedPrefixes();
@@ -399,6 +445,11 @@ class FabricaClient implements DataCiteClient
         return $newPrefixes;
     }
 
+    /**
+     * @return array
+     *
+     * also not used
+     */
     public function syncProviderPrefixes(){
         $newPrefixes = [];
         $result = $this->getProviderPrefixes();
@@ -414,6 +465,12 @@ class FabricaClient implements DataCiteClient
         return $newPrefixes;
     }
 
+    /**
+     * @return array|bool|float|int|string
+     *
+     * NOT used but can have future usage if syncing prefixes from datacite ever get implemented
+     * return ALL prefixes ANDS ownes
+     */
     public function getProviderPrefixes()
     {
         $response = "";
@@ -434,6 +491,12 @@ class FabricaClient implements DataCiteClient
 
     }
 
+    /**
+     * @param TrustedClient $client
+     * @return array|bool|float|int|string
+     * also not used currently
+     * return ALL prefixes a client is assigned to
+     */
     public function getClientPrefixes(TrustedClient $client)
     {
         try {
@@ -454,6 +517,12 @@ class FabricaClient implements DataCiteClient
         return $response->json();
     }
 
+
+    /**
+     * @param $prefix_value
+     * @return mixed
+     * claim ownership of prefixes for future usage
+     */
     private function claimUnassignedPrefix($prefix_value){
         $prefixInfo = $this->getPrefixInfo($prefix_value);
 
@@ -471,6 +540,7 @@ class FabricaClient implements DataCiteClient
                 $newPrefix = array("prefix_value" => $prefix_value,
                     "datacite_id" => $result['data']['id'],
                     "created" => $result['data']['attributes']['created']);
+                // add the prefix to our registry if successfully claimed
                 $this->clientRepository->addOrUpdatePrefix($newPrefix);
             }
         }
@@ -487,13 +557,20 @@ class FabricaClient implements DataCiteClient
     }
 
 
-
-
+    /**
+     * @param int $count
+     * @return array
+     * used to claim prefixes for new trusted clients if we are low or have none
+     *
+     */
     public function claimNumberOfUnassignedPrefixes($count = 3){
+        // finds all unassigned prefixes on Fabrica
         $unallocatedPrefixes = $this->getUnAssignedPrefixes();
         $newPrefixes = [];
+
         foreach($unallocatedPrefixes['data'] as $prefix)
         {
+            // claim only the required number of prefixes
             $newPrefixes[] = $this->claimUnassignedPrefix($prefix['id']);
             if(--$count == 0)
                 break;
@@ -506,6 +583,11 @@ class FabricaClient implements DataCiteClient
      *
      */
 
+    /**
+     * @return array|bool|float|int|string
+     * get information for all unassigned prefixes from Fabrica
+     * that can be claimed by allocators such as ANDS
+     */
     public function getUnAssignedPrefixes()
     {
         $response = "";
@@ -530,6 +612,16 @@ class FabricaClient implements DataCiteClient
      UnAllocated Prefix means that a Prefix is taken by ANDS but not assigned to datacenters eg one of our trusted client
      *
      */
+
+    /**
+     * @return array|bool|float|int|string
+     *
+     * get the information of all claimed but unallocated prefixes from Fabrica
+     * this is used to store the prefix metadata in our database
+     * the prefixes then picked up by the registry to populate the drop down of prefixes
+     * when new client is created or existing ones are modified
+     *
+     */
     public function getUnalocatedPrefixes()
     {
         $response = "";
@@ -549,8 +641,21 @@ class FabricaClient implements DataCiteClient
         return $response->json();
     }
 
+
+    /*
+     *
+     *
+     * The following functions are used to generate client information that is sent to datacite
+     *
+     *
+     */
+
+
+
+
     /**
      * @param TrustedClient $client
+     * generates a JSON representation of a trusted client
      * @return string
      */
     public function getClientInfo(TrustedClient $client)
@@ -573,6 +678,9 @@ class FabricaClient implements DataCiteClient
 
     /**
      * @param TrustedClient $client
+     * generates a JSON representation of a client and it's active prefix
+     * note: only active prefix sinse datacite
+     * rejects adding prefixes with a 500 response if prefix already given to the client
      * @return string
      */
     public function getClientPrefixInfo(TrustedClient $tClient)
@@ -599,7 +707,13 @@ class FabricaClient implements DataCiteClient
         return json_encode($prefixInfo);
     }
 
-    
+
+    /**
+     * @param TrustedClient $client
+     * @return string
+     * returns a comma separated string of the client's domains
+     *
+     */
     public function getClientDomains(TrustedClient $client){
         $domains_str = "";
         $first = true;
@@ -612,6 +726,10 @@ class FabricaClient implements DataCiteClient
         return $domains_str;
     }
 
+    /**
+     * @param TrustedClient $client
+     * @return arrayretrurns all prefixes of the given client
+     */
     public function getPrefixes(TrustedClient $client){
         $prefixes = array();
         foreach ($client->prefixes as $clientPrefix) {
@@ -621,6 +739,10 @@ class FabricaClient implements DataCiteClient
         return array("data" => $prefixes);
     }
 
+    /**
+     * @param TrustedClient $client
+     * @return arrayretrurns the active prefix of the given client
+     */
     public function getActivePrefix(TrustedClient $client){
         foreach ($client->prefixes as $clientPrefix) {
             if($clientPrefix->active)

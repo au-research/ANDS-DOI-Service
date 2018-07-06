@@ -124,6 +124,8 @@ class ClientRepository
 
     /**
      * @return mixed
+     * find all prefixes in the database that has no clients assigned to
+     * the exclude list was added to allow eg: legacy prefixes are not included in result
      */
     public function getUnalocatedPrefixes($excluding = [])
     {
@@ -133,8 +135,12 @@ class ClientRepository
     }
 
     /**
-     * param excluded list of prefixes
-     * @return Prefix
+     * @param array $excluding
+     * @return mixed
+     * return the first unalocated prefix
+     * can be used to randomly assign prefixes to clients
+     * eg release 28 when all trusted clients had to get a new prefix
+     * the exclude list was added to allow eg: legacy prefixes are not included in result
      */
     public function getOneUnallocatedPrefix($excluding = [])
     {
@@ -142,7 +148,11 @@ class ClientRepository
         return Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->first();
 
     }
-    
+
+    /**
+     * @param $pPrefix
+     * as its name says
+     */
     public function addOrUpdatePrefix($pPrefix){
         $prefix = Prefix::where("prefix_value", $pPrefix['prefix_value'])->first();
         if($prefix)
