@@ -113,11 +113,22 @@ class DOIServiceProvider
      *
      * @return bool
      */
-    public function isDoiAuthenticatedClients($doiValue)
-    {
+    public function isDoiAuthenticatedClients($doiValue, $client_id = null)
+        {
+
         $client = $this->getAuthenticatedClient();
-        $clientPrefix = $client->datacite_prefix . str_pad($client->client_id, 2, 0, STR_PAD_LEFT) . "/";
-        return (strpos($doiValue, $clientPrefix) === 0);
+
+        if($client_id === null)
+            return false;
+
+        if($client->client_id != $client_id)
+            return false;
+
+        foreach ($client->prefixes as $clientPrefix) {
+            if(strpos($doiValue, $clientPrefix->prefix->prefix_value) === 0)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -152,14 +163,13 @@ class DOIServiceProvider
             $doiValue = XMLValidator::getDOIValue($xml);
         }else{
             $doiValue = $this->getNewDOI();
+            // replaced doiValue
+            $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
         }
+
         $this->setResponse('doi', $doiValue);
 
         // validation on the DOIValue
-
-        // replaced doiValue
-        $xml = XMLValidator::replaceDOIValue($doiValue, $xml);
-
         // Validate xml
         if($this->validateXML($xml) === false){
             $this->setResponse('responsecode', 'MT006');
@@ -203,25 +213,34 @@ class DOIServiceProvider
 
     /**
      * Returns a new DOI for the currently existing authenticated client
+     * if client has no active prefix it probably means it's a test client
      *
      * @return string
      */
-    private function getNewDOI()
+    public function getNewDOI()
     {
-        $prefix = $this->getAuthenticatedClient()->datacite_prefix;
+        // get the first active prefix for this authenticated client
+        $prefix = "10.5072";
 
-        // set to test prefix if  authenticated client is a test DOI APP ID
-        if (substr($this->getAuthenticatedClient()->app_id, 0, 4) == 'TEST') {
-            $prefix = "10.5072/";
+        $client = $this->getAuthenticatedClient();
+        if(sizeof($client->prefixes) > 0){
+            foreach ($client->prefixes as $clientPrefix) {
+                if($clientPrefix->active) {
+                    $prefix = $clientPrefix->prefix->prefix_value;
+                    break;
+                }
+            }
         }
 
-        $testStr = $prefix == '10.5072/'? "TEST_DOI_" : "";
+        $prefix = ends_with($prefix, '/') ? $prefix : $prefix .'/';
+        
+        // set to test prefix if  authenticated client is a test DOI APP ID
 
-        $client_id = str_pad($this->getAuthenticatedClient()->client_id, 2,0,STR_PAD_LEFT)."/";
+        $testStr = $prefix == '10.5072/' ? "TEST_DOI_" : "";
 
         $doiValue = uniqid();
 
-        return $prefix . $client_id . $testStr . $doiValue;
+        return $prefix . $testStr . $doiValue;
     }
 
     public function insertNewDOI($doiValue,$xml,$url){
@@ -274,7 +293,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
@@ -357,7 +376,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
@@ -388,6 +407,44 @@ class DOIServiceProvider
     }
 
     /**
+     * get status of the DOI
+     *
+     * @param $doiValue
+     * @return bool
+     */
+    public function getStatus($doiValue)
+    {
+        // validate client
+        if (!$this->isClientAuthenticated()) {
+            $this->setResponse('responsecode', 'MT009');
+            return false;
+        }
+
+        //get the doi info
+        $doi = $this->doiRepo->getByID($doiValue);
+        $this->setResponse('doi', $doiValue);
+
+        if ($doi === null) {
+            $this->setResponse('responsecode', 'MT011');
+            return true;
+        }
+
+        // check if this client owns this doi
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
+            $this->setResponse('responsecode', 'MT008');
+            $this->setResponse('verbosemessage', $doiValue . " is not owned by " . $this->getAuthenticatedClient()->client_name);
+            return false;
+        }
+
+        $this->setResponse('responsecode', 'MT019');
+        $this->setResponse('verbosemessage', $doi->status);
+
+        return true;
+
+    }
+
+
+    /**
      * Deactivate a DOI
      *
      * @param $doiValue
@@ -412,7 +469,7 @@ class DOIServiceProvider
         }
 
         // check if this client owns this doi
-        if (!$this->isDoiAuthenticatedClients($doiValue)) {
+        if (!$this->isDoiAuthenticatedClients($doiValue, $doi->client_id)) {
             $this->setResponse('responsecode', 'MT008');
             $this->setResponse('verbosemessage',$doiValue." is not owned by ".$this->getAuthenticatedClient()->client_name);
             return false;
@@ -427,7 +484,6 @@ class DOIServiceProvider
         }
 
         $result = $this->dataciteClient->deActivate($doiValue);
-
 
         if ($result === true) {
             $this->setResponse('responsecode', 'MT003');

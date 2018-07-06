@@ -4,6 +4,8 @@ namespace ANDS\DOI\Repository;
 
 use ANDS\DOI\Validator\IPValidator;
 use ANDS\DOI\Model\Client as Client;
+use ANDS\DOI\Model\ClientPrefixes as ClientPrefixes;
+use ANDS\DOI\Model\Prefix as Prefix;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ClientRepository
@@ -11,6 +13,12 @@ class ClientRepository
 
     private $message = null;
 
+    /**
+     * Create a client
+     *
+     * @param $params
+     * @return Client
+     */
     public function create($params)
     {
         $client = new Client;
@@ -23,6 +31,26 @@ class ClientRepository
         return $client;
     }
 
+    /**
+     * Update a client
+     *
+     * @param $params
+     * @return Client
+     */
+    public function updateClient($params)
+    {
+        $clientId = $params['client_id'];
+        $client = $this->getByID($clientId);
+        $client->update($params);
+        $client->save();
+        return $client;
+    }
+
+    /**
+     * Returns all Clients
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
     public function getAll()
     {
         return Client::all();
@@ -57,27 +85,72 @@ class ClientRepository
             $prefix .= "C";
         }
 
-        $client->datacite_symbol = $prefix.$id;
+        $client->datacite_symbol = $prefix . $id;
         $client->save();
 
         return $client;
     }
 
-    public function getFirst()
-    {
-        return Client::first();
-    }
-
+    /**
+     * @param $id
+     * @return Client
+     */
     public function getByID($id)
     {
         return Client::find($id);
     }
 
+    /**
+     * @param $appID
+     * @return Client
+     */
     public function getByAppID($appID)
     {
         return Client::where('app_id', $appID)->first();
     }
 
+    /**
+     * @param $id
+     */
+    public function deleteClientById($id)
+    {
+        $client = static::getByID($id);
+        $client->removeClientDomains();
+        $client->removeClientPrefixes();
+
+        // TODO soft delete
+        $client->delete();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnalocatedPrefixes($excluding = [])
+    {
+        $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
+        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->get();
+        return $prefixes;
+    }
+
+    /**
+     * param excluded list of prefixes
+     * @return Prefix
+     */
+    public function getOneUnallocatedPrefix($excluding = [])
+    {
+        $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
+        return Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->first();
+
+    }
+    
+    public function addOrUpdatePrefix($pPrefix){
+        $prefix = Prefix::where("prefix_value", $pPrefix['prefix_value'])->first();
+        if($prefix)
+            $prefix->update($pPrefix);
+        else
+            $prefix = new Prefix($pPrefix);
+        $prefix->save();
+    }
     /**
      * Authenticate a client based on their shared secret and/or their ipAddress
      *
@@ -85,7 +158,7 @@ class ClientRepository
      * @param null $sharedSecret
      * @param null $ipAddress
      * @param bool $manual
-     * @return bool
+     * @return Client|bool
      */
     public function authenticate(
         $appID,
@@ -94,8 +167,8 @@ class ClientRepository
         $manual = false
     ) {
         $test_prefix = false;
-        if(substr($appID,0,4)=="TEST") {
-            $appID = str_replace("TEST","",$appID);
+        if (substr($appID, 0, 4) == "TEST") {
+            $appID = str_replace("TEST", "", $appID);
             $test_prefix = true;
         }
         $client = $this->getByAppID($appID);
@@ -113,7 +186,9 @@ class ClientRepository
 
         //client exists and has been set to a test account via the app_id make sure that the test prefix is used
 
-        if($test_prefix) $client['datacite_prefix'] = "10.5072/";
+        if ($test_prefix) {
+            $client['datacite_prefix'] = "10.5072/";
+        }
 
         // if sharedSecret is provided
         if ($sharedSecret) {
@@ -129,7 +204,7 @@ class ClientRepository
         if ($ipAddress &&
             IPValidator::validate($ipAddress, $client->ip_address) === false
         ) {
-            $this->setMessage("Authentication Failed. Mismatch IP Address. Provided IP Address: ". $ipAddress);
+            $this->setMessage("Authentication Failed. Mismatch IP Address. Provided IP Address: " . $ipAddress);
             return false;
         }
 
@@ -185,6 +260,5 @@ class ClientRepository
         $this->message = $message;
         return $this;
     }
-
 
 }
