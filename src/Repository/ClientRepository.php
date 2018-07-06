@@ -137,7 +137,7 @@ class ClientRepository
     /**
      * @param array $excluding
      * @return mixed
-     * return the first unalocated prefix
+     * return the first unallocated prefix
      * can be used to randomly assign prefixes to clients
      * eg release 28 when all trusted clients had to get a new prefix
      * the exclude list was added to allow eg: legacy prefixes are not included in result

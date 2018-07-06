@@ -90,7 +90,7 @@ class FabricaClient implements DataCiteClient
     }
 
 
-    ///Don't have an activate function...updating the xml activates a deactivated doi...
+    //Don't have an activate function...updating the xml activates a deactivated doi...
     public function activate($xmlBody = false)
     {
         return "not implemented yet";
@@ -212,7 +212,7 @@ class FabricaClient implements DataCiteClient
 
     /**
      * clears messages
-     * this function should be called after each request to avoid messages to be combined
+     * this function should be called after each request to avoid messages being combined
      */
     public function clearMessages()
     {
@@ -227,7 +227,7 @@ class FabricaClient implements DataCiteClient
      */
     public function addClient(TrustedClient $client)
     {
-        // clientinfo if fabrica's JSON representation of a client metadata
+        // clientinfo is fabrica's JSON representation of a client metadata
         $clientInfo = $this->getClientInfo($client);
         $headers = [
             'Content-type' => 'application/json; charset=utf-8',
@@ -254,7 +254,7 @@ class FabricaClient implements DataCiteClient
 
     /*
      * @param Trustedclient
-     * same as addclient but PATCH request to url containg the datasite_symbol if the client
+     * same as addclient but PATCH request to url containing the datacite_symbol of the client
      *
      */
     public function updateClient(TrustedClient $client)
@@ -284,7 +284,7 @@ class FabricaClient implements DataCiteClient
 
     /**
      * @param TrustedClient $client
-     * client prefixes added in a seperate request
+     * client prefixes added in a separate request
      * make sure the request is not called if prefix already given to the client at datacite
      * or it will result a 500 error response
      */
@@ -324,7 +324,7 @@ class FabricaClient implements DataCiteClient
 
     /**
      * @param TrustedClient $client
-     * a simple DELETE request containg the datacite-symbol of the client
+     * a simple DELETE request containing the datacite-symbol of the client
      * it was tested and it works but we shouldn't delete a client unless it was created in error
      * datacite keeps client symbols (datacite's client's primary key) even after deletion.
      */
@@ -468,8 +468,8 @@ class FabricaClient implements DataCiteClient
     /**
      * @return array|bool|float|int|string
      *
-     * NOT used but can have future usage if syncing prefixes from datacite ever get implemented
-     * return ALL prefixes ANDS ownes
+     * NOT used but can have future usage if syncing prefixes from datacite ever gets implemented
+     * return ALL prefixes ANDS owns
      */
     public function getProviderPrefixes()
     {
@@ -679,7 +679,7 @@ class FabricaClient implements DataCiteClient
     /**
      * @param TrustedClient $client
      * generates a JSON representation of a client and it's active prefix
-     * note: only active prefix sinse datacite
+     * note: only active prefix since datacite
      * rejects adding prefixes with a 500 response if prefix already given to the client
      * @return string
      */
@@ -728,7 +728,7 @@ class FabricaClient implements DataCiteClient
 
     /**
      * @param TrustedClient $client
-     * @return arrayretrurns all prefixes of the given client
+     * @return array returns all prefixes of the given client
      */
     public function getPrefixes(TrustedClient $client){
         $prefixes = array();
@@ -741,7 +741,7 @@ class FabricaClient implements DataCiteClient
 
     /**
      * @param TrustedClient $client
-     * @return arrayretrurns the active prefix of the given client
+     * @return array returns the active prefix of the given client
      */
     public function getActivePrefix(TrustedClient $client){
         foreach ($client->prefixes as $clientPrefix) {

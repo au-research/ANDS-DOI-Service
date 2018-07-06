@@ -88,7 +88,7 @@ class Client extends Model
 
     /**
      * @return mixed
-     * each clinet can have One and only one active prefix that is used when minting NEW DOI
+     * each client can have One and only one active prefix that is used when minting NEW DOI
      *
      */
     public function getActivePrefix()
@@ -143,10 +143,10 @@ class Client extends Model
         }
 
         try {
-            // Get the Prefix if exists
+            // Get the Prefix if it exists
             $prefix = Prefix::where("prefix_value", $prefix_value)->first();
             if($prefix) {
-                //if this prefix already assigned to this client do nothing)
+                //if this prefix is already assigned to this client do nothing)
                 $cp = ClientPrefixes::where("prefix_id", $prefix->id)
                     ->where("client_id", $this->client_id)->first();
                 if ($cp != null) {
@@ -159,7 +159,7 @@ class Client extends Model
         }
         catch(Exception $e)
         {}
-        // should never happen since all prefixed must be preloaded
+        // should never happen since all prefixes must be preloaded
         if($prefix == null)// create a new prefix and assign it to the Client
         {
             $prefix = new Prefix(["prefix_value" => $prefix_value]);

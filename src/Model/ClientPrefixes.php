@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
  * @package ANDS\DOI\Model
  *
  * as of R28 trusted clients were given new and unique prefixes
- * this solution allowed to have their legacy prefix as well
- * their current and active prefix stored in the databse
+ * this solution allowed to have record of their legacy prefix as well as
+ * their current and active prefix stored in the database
  *
  *
  */

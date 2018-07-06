@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Prefix
  * @package ANDS\DOI\Model
  *
- * a datacite prefix that is stored in the registry
+ * a datacite prefix that is stored in the database
  *
  */
 class Prefix Extends Model
