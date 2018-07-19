@@ -91,7 +91,9 @@ class MdsClient implements DataCiteClient
     ///Don't have an activate function...updating the xml activates a deactivated doi...
     public function activate($xmlBody = false)
     {
-        return $this->request($this->dataciteUrl . 'metadata/', $xmlBody);
+        $this->request($this->dataciteUrl . 'metadata/', $xmlBody);
+
+        return $this->hasError() ? false : true;
     }
 
     public function deActivate($doiId)
