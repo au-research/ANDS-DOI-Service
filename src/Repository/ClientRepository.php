@@ -106,7 +106,11 @@ class ClientRepository
      */
     public function getByAppID($appID)
     {
-        return Client::where('app_id', $appID)->first();
+        //amended where clause to check either app_id or test_app_id of merged prod/test client R29
+        return Client::where(function ($query) use ($appID) {
+            $query->where('app_id', '=', $appID)
+                ->orWhere('test_app_id', '=', $appID);
+        })->first();
     }
 
     /**
