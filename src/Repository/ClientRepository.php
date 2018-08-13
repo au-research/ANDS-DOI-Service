@@ -181,9 +181,11 @@ class ClientRepository
         $manual = false
     ) {
         $test_prefix = false;
+        $test_on_prod = false;
         if (substr($appID, 0, 4) == "TEST") {
             $appID = str_replace("TEST", "", $appID);
             $test_prefix = true;
+            $test_on_prod = true;
         }
 
         $client = $this->getByAppID($appID);
@@ -213,7 +215,7 @@ class ClientRepository
         // if sharedSecret is provided
 
         //if the test_app_id is being used compare provided shared secret with test_shared_secret
-        if ($sharedSecret && $test_prefix) {
+        if ($sharedSecret && $test_prefix && !$test_on_prod) {
             if ($client->test_shared_secret !== $sharedSecret) {
                 $this->setMessage("Authentication Failed. Mismatch test shared secret provided");
                 return false;
