@@ -185,12 +185,18 @@ class ClientRepository
             $appID = str_replace("TEST", "", $appID);
             $test_prefix = true;
         }
+
         $client = $this->getByAppID($appID);
 
         // No Client Exists
         if ($client === null) {
             $this->setMessage("Client does not exists");
             return false;
+        }
+
+        //if the client has passed their test app_id we need to set prefix to test prefix
+        if ($client->test_app_id == $appID ) {
+            $test_prefix = true;
         }
 
         // Client exists and it's a manual request
@@ -201,16 +207,23 @@ class ClientRepository
         //client exists and has been set to a test account via the app_id make sure that the test prefix is used
 
         if ($test_prefix) {
-            $client['datacite_prefix'] = "10.5072/";
+            $client['mode'] = "test";
         }
 
         // if sharedSecret is provided
-        if ($sharedSecret) {
+
+        //if the test_app_id is being used compare provided shared secret with test_shared_secret
+        if ($sharedSecret && $test_prefix) {
+            if ($client->test_shared_secret !== $sharedSecret) {
+                $this->setMessage("Authentication Failed. Mismatch test shared secret provided");
+                return false;
+            }
+            return $client;
+        }elseif($sharedSecret){
             if ($client->shared_secret !== $sharedSecret) {
                 $this->setMessage("Authentication Failed. Mismatch shared secret provided");
                 return false;
             }
-
             return $client;
         }
 

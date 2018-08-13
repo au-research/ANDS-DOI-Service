@@ -114,7 +114,7 @@ class DOIServiceProvider
      * @return bool
      */
     public function isDoiAuthenticatedClients($doiValue, $client_id = null)
-        {
+    {
 
         $client = $this->getAuthenticatedClient();
 
@@ -223,7 +223,9 @@ class DOIServiceProvider
         $prefix = "10.5072";
 
         $client = $this->getAuthenticatedClient();
-        if(sizeof($client->prefixes) > 0){
+
+        //if this client is not in test mode grab their production prefix
+        if(sizeof($client->prefixes) > 0 && $client->mode !== 'test'){
             foreach ($client->prefixes as $clientPrefix) {
                 if($clientPrefix->active) {
                     $prefix = $clientPrefix->prefix->prefix_value;
@@ -233,8 +235,6 @@ class DOIServiceProvider
         }
 
         $prefix = ends_with($prefix, '/') ? $prefix : $prefix .'/';
-        
-        // set to test prefix if  authenticated client is a test DOI APP ID
 
         $testStr = $prefix == '10.5072/' ? "TEST_DOI_" : "";
 
@@ -493,7 +493,7 @@ class DOIServiceProvider
             $this->setResponse('responsecode', 'MT010');
         }
 
-         return $result;
+        return $result;
 
     }
 
@@ -515,7 +515,7 @@ class DOIServiceProvider
     {
         return $this->response;
     }
-    
+
     public function getDataCiteResponse()
     {
         return $this->dataciteClient->getResponse() ?: [];
