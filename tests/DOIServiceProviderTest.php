@@ -55,7 +55,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($authenticate);
         $this->assertNotNull($sp->getAuthenticatedClient());
         $this->assertTrue($sp->isClientAuthenticated());
-        $this->assertEquals("10.5072/", $client['datacite_prefix']);
+        $this->assertEquals("test", $client['mode']);
     }
 
     /** @test **/
