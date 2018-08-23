@@ -106,7 +106,11 @@ class ClientRepository
      */
     public function getByAppID($appID)
     {
-        return Client::where('app_id', $appID)->first();
+        //amended where clause to check either app_id or test_app_id of merged prod/test client R29
+        return Client::where(function ($query) use ($appID) {
+            $query->where('app_id', '=', $appID)
+                ->orWhere('test_app_id', '=', $appID);
+        })->first();
     }
 
     /**
@@ -118,9 +122,11 @@ class ClientRepository
         $client->removeClientDomains();
         $client->removeClientPrefixes();
 
-        // TODO soft delete
-        $client->delete();
-    }
+        //soft delete
+        $params = array('status'=>'INACTIVE');
+        $client->update($params);
+        $client->save();
+       }
 
     /**
      * @return mixed
@@ -177,16 +183,24 @@ class ClientRepository
         $manual = false
     ) {
         $test_prefix = false;
+        $test_on_prod = false;
         if (substr($appID, 0, 4) == "TEST") {
             $appID = str_replace("TEST", "", $appID);
             $test_prefix = true;
+            $test_on_prod = true;
         }
+
         $client = $this->getByAppID($appID);
 
         // No Client Exists
         if ($client === null) {
             $this->setMessage("Client does not exists");
             return false;
+        }
+
+        //if the client has passed their test app_id we need to set prefix to test prefix
+        if ($client->test_app_id == $appID ) {
+            $test_prefix = true;
         }
 
         // Client exists and it's a manual request
@@ -197,16 +211,23 @@ class ClientRepository
         //client exists and has been set to a test account via the app_id make sure that the test prefix is used
 
         if ($test_prefix) {
-            $client['datacite_prefix'] = "10.5072/";
+            $client['mode'] = "test";
         }
 
         // if sharedSecret is provided
-        if ($sharedSecret) {
+
+        //if the test_app_id is being used compare provided shared secret with test_shared_secret
+        if ($sharedSecret && $test_prefix && !$test_on_prod) {
+            if ($client->test_shared_secret !== $sharedSecret) {
+                $this->setMessage("Authentication Failed. Mismatch test shared secret provided");
+                return false;
+            }
+            return $client;
+        }elseif($sharedSecret){
             if ($client->shared_secret !== $sharedSecret) {
                 $this->setMessage("Authentication Failed. Mismatch shared secret provided");
                 return false;
             }
-
             return $client;
         }
 

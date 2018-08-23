@@ -13,7 +13,10 @@ class Client extends Model
         'app_id',
         'client_contact_email',
         'datacite_symbol',
-        'shared_secret'
+        'shared_secret',
+        'test_app_id',
+        'test_shared_secret',
+        'mode'
     ];
 
     public $timestamps = false;
