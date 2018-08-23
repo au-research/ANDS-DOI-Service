@@ -122,9 +122,11 @@ class ClientRepository
         $client->removeClientDomains();
         $client->removeClientPrefixes();
 
-        // TODO soft delete
-        $client->delete();
-    }
+        //soft delete
+        $params = array('status'=>'INACTIVE');
+        $client->update($params);
+        $client->save();
+       }
 
     /**
      * @return mixed
