@@ -16,7 +16,8 @@ class Client extends Model
         'shared_secret',
         'test_app_id',
         'test_shared_secret',
-        'mode'
+        'mode',
+        'status',
     ];
 
     public $timestamps = false;
