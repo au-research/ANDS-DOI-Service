@@ -290,7 +290,6 @@ class FabricaClient implements DataCiteClient
      */
     public function updateClientPrefixes(TrustedClient $client)
     {
-
         // a JSON representation of the client's prefix relationship
         $clientInfo = $this->getClientPrefixInfo($client);
 
@@ -298,11 +297,13 @@ class FabricaClient implements DataCiteClient
             $this->messages[] = "No Active Prefix assigned!";
             return;
         }
+
         $headers = [
             'Content-type' => 'application/json; charset=utf-8',
             'Accept' => 'application/json',
             'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
         ];
+
         $response = "";
 
         $request = $this->http->post('/client-prefixes', $headers, $clientInfo);
@@ -677,10 +678,12 @@ class FabricaClient implements DataCiteClient
     }
 
     /**
-     * @param TrustedClient $client
+     *
      * generates a JSON representation of a client and it's active prefix
      * note: only active prefix since datacite
      * rejects adding prefixes with a 500 response if prefix already given to the client
+     *
+     * @param TrustedClient $tClient
      * @return string
      */
     public function getClientPrefixInfo(TrustedClient $tClient)
@@ -689,7 +692,7 @@ class FabricaClient implements DataCiteClient
         $client = ["data" => ["type" => "clients",
             "id" => strtolower($tClient->datacite_symbol)]];
         $prefix = $this->getActivePrefix($tClient);
-        if(!$prefix){
+        if (!$prefix) {
             return false;
         }
         $relationships = ["client" => $client, "prefix" => $prefix];
