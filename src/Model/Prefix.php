@@ -10,6 +10,13 @@ namespace ANDS\DOI\Model;
 use Illuminate\Database\Eloquent\Model;
 
 
+/**
+ * Class Prefix
+ * @package ANDS\DOI\Model
+ *
+ * a datacite prefix that is stored in the database
+ *
+ */
 class Prefix Extends Model
 {
     protected $table = "prefixes";

@@ -13,7 +13,11 @@ class Client extends Model
         'app_id',
         'client_contact_email',
         'datacite_symbol',
-        'shared_secret'
+        'shared_secret',
+        'test_app_id',
+        'test_shared_secret',
+        'mode',
+        'status',
     ];
 
     public $timestamps = false;
@@ -72,6 +76,13 @@ class Client extends Model
      * Returns all the prefixes assigned to this client
      */
 
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * prefixes are a many to many relationships as of R28
+     * client prefixes is to capture client's prefix relationships
+     *
+     */
     public function prefixes()
     {
         return $this->hasMany(
@@ -79,11 +90,20 @@ class Client extends Model
         );
     }
 
+    /**
+     * @return mixed
+     * each client can have One and only one active prefix that is used when minting NEW DOI
+     *
+     */
     public function getActivePrefix()
     {
         return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->first();
     }
 
+    /**
+     * @param $prefixes
+     * not used outside of testing
+     */
     public function addClientPrefixes($prefixes){
         $prefixArray = explode(",", $prefixes);
         foreach ($prefixArray as $p){
@@ -91,6 +111,12 @@ class Client extends Model
         }
     }
 
+    /**
+     * @param $prefix_value
+     * @return bool
+     * tests if client has already been assigned this prefix
+     *
+     */
     public function hasPrefix($prefix_value){
         $clientPrefixes = ClientPrefixes::where("client_id", $this->client_id)->get();
         foreach ($clientPrefixes as $clientPrefix) {
@@ -102,6 +128,12 @@ class Client extends Model
 
     /** add prefix to client */
 
+    /**
+     * @param $prefix_value
+     * @param bool $active
+     *
+     * assigns a prefix to a client
+     */
     public function addClientPrefix($prefix_value, $active = true){
 
         $prefix = null;
@@ -115,10 +147,10 @@ class Client extends Model
         }
 
         try {
-            // Get the Prefix if exists
+            // Get the Prefix if it exists
             $prefix = Prefix::where("prefix_value", $prefix_value)->first();
             if($prefix) {
-                //if this prefix already assigned to this client do nothing)
+                //if this prefix is already assigned to this client do nothing)
                 $cp = ClientPrefixes::where("prefix_id", $prefix->id)
                     ->where("client_id", $this->client_id)->first();
                 if ($cp != null) {
@@ -131,7 +163,7 @@ class Client extends Model
         }
         catch(Exception $e)
         {}
-        // should never happen since all prefixed must be preloaded
+        // should never happen since all prefixes must be preloaded
         if($prefix == null)// create a new prefix and assign it to the Client
         {
             $prefix = new Prefix(["prefix_value" => $prefix_value]);
@@ -141,6 +173,10 @@ class Client extends Model
         $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active]));
     }
 
+    /**
+     * @param $prefix_value
+     * not used outside of testing
+     */
     public function removeClientPrefix($prefix_value){
         $prefix = Prefix::where("prefix_value", $prefix_value)->first();
         if($prefix == null){
@@ -148,8 +184,11 @@ class Client extends Model
         }
         ClientPrefixes::where("client_id", $this->client_id)->where("prefix_id", $prefix->id)->delete();
     }
-    
-    
+
+    /**
+     *
+     * also not used outside of testing
+     */
     public function removeClientPrefixes(){
         ClientPrefixes::where("client_id", $this->client_id)->delete();
     }

@@ -18,9 +18,8 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         $doi = '10.5072/'.uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $this->client->mint(
-            $doi, "https://devl.ands.org.au/minh/", $xml, false
+            $doi, "https://devl.ands.org.au/minh/", $xml
         );
-//        dd($response);
         $this->assertTrue($response);
     }
 
@@ -32,14 +31,6 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         );
     }
 
-//    /** @test */
-//    public function it_should_return_a_doi()
-//    {
-//        $get = $this->client->get($this->testDoiId);
-//        $this->assertEquals($get, "https://devl.ands.org.au/minh/");
-//        $this->assertFalse($this->client->hasError());
-//    }
-
     /** @test */
     public function it_should_return_good_xml_for_a_doi()
     {
@@ -50,8 +41,6 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("resource", $actual->firstChild->tagName);
     }
 
-
-
     /** @test **/
     public function it_should_mint_a_schema_version_4_doi()
     {
@@ -59,7 +48,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         $doi = '10.5072/'.uniqid();
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $response = $this->client->mint(
-            $doi, "https://devl.ands.org.au/minh/", $xml, false
+            $doi, "https://devl.ands.org.au/minh/", $xml
         );
         $this->assertTrue($response);
     }
@@ -76,45 +65,30 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
     /** @test */
     public function it_should_update_a_doi_with_new_xml()
     {
-        //run update with new xml
-        //get the new xml and make sure it's the same
-        //put old xml back
-        $metadata = $this->client->getMetadata($this->testDoiId);
-        $replace= file_get_contents(__DIR__."/assets/replace_sample.xml");
-        $this->client->update($replace);
-        $this->assertEquals($this->client->getMetadata($this->testDoiId), $replace);
-        //revert back to old xml
-        $this->client->update($metadata);
-    }
-    
+        // given a doi, updates it's xml
+        $replace = file_get_contents(__DIR__ . "/assets/replace_sample.xml");
+        $response = $this->client->update($replace);
 
-//    /** @test */
-//    public function it_should_update_a_doi_with_new_url()
-//    {
-//        //run update with new url
-//        //get the new url and make sure it's the same
-//        //put old url back
-//        $url =  $this->client->get($this->testDoiId);
-//
-//        $new_url= "https://devl.ands.org.au/minh_replaced/" ;
-//
-//        $this->client->updateURL($this->testDoiId,$new_url);
-//
-//        $this->assertEquals($this->client->get($this->testDoiId), $new_url);
-//
-//        //revert back to old url
-//        $this->client->updateURL($this->testDoiId,$url);
-//
-//    }
+        // it should have the new xml
+        $this->assertTrue($response);
+        $this->assertXmlStringEqualsXmlString(
+            strtolower($this->client->getMetadata($this->testDoiId)),
+            strtolower($replace)
+        );
+    }
 
     /** @test */
     public function it_should_activate_a_doi_and_then_deactivate()
     {
-        //make sure the DOI is activated
-        //deactivate it
-        //make sure it's deactivated
-        //activate it
-        //make sure it's activated in the status
+        // given an activated doi
+        $xml = $this->client->getMetadata($this->testDoiId);
+        $this->client->activate($xml);
+
+        // deactivation successful
+        $this->assertTrue($this->client->deActivate($this->testDoiId));
+
+        // activation successful
+        $this->assertTrue($this->client->activate($xml));
     }
 
     /**
@@ -152,7 +126,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
         $doi = $this->testDoiId;
         $xml = XMLValidator::replaceDOIValue($doi, $xml);
         $this->client->mint(
-            $doi, "https://devl.ands.org.au/minh/", $xml, false
+            $doi, "https://devl.ands.org.au/minh/", $xml
         );
     }
     
