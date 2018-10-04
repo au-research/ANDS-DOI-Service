@@ -25,6 +25,11 @@ class DOIServiceProvider
     private $response = null;
 
     /**
+     * @var string
+     */
+    protected static $globalTestPrefix = "10.5072";
+
+    /**
      * DOIServiceProvider constructor.
      * @param ClientRepository $clientRespository
      * @param DoiRepository $doiRespository
@@ -109,25 +114,34 @@ class DOIServiceProvider
     /**
      * Returns if a client is authenticated
      *
-     * @param $doiValuegit status
-     *
+     * @param $doiValue
+     * @param null $client_id
      * @return bool
      */
     public function isDoiAuthenticatedClients($doiValue, $client_id = null)
     {
+        if ($client_id === null) {
+            return false;
+        }
 
         $client = $this->getAuthenticatedClient();
 
-        if($client_id === null)
+        if ($client->client_id != $client_id) {
             return false;
-
-        if($client->client_id != $client_id)
-            return false;
-
-        foreach ($client->prefixes as $clientPrefix) {
-            if(strpos($doiValue, $clientPrefix->prefix->prefix_value) === 0)
-                return true;
         }
+
+        // everyone has access to test prefix
+        if (strpos($doiValue, DOIServiceProvider::$globalTestPrefix)) {
+            return true;
+        }
+
+        // check if the client owns the prefix
+        foreach ($client->prefixes as $clientPrefix) {
+            if (strpos($doiValue, $clientPrefix->prefix->prefix_value) === 0) {
+                return true;
+            }
+        }
+
         return false;
     }
 
