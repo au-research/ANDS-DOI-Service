@@ -131,7 +131,7 @@ class DOIServiceProvider
         }
 
         // everyone has access to test prefix
-        if (strpos($doiValue, DOIServiceProvider::$globalTestPrefix)) {
+        if (strpos($doiValue, DOIServiceProvider::$globalTestPrefix) === 0) {
             return true;
         }
 
