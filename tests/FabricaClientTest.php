@@ -242,8 +242,9 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
             ];
             var_dump("add_new_client");
             $this->trustedClient = $this->repo->create($params);
+            $this->trustedClient->save();
         }
-        $this->trustedClient->save();
+
 
     }
 

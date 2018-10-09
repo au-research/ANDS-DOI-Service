@@ -420,7 +420,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
 
         $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
-        $client->removeClientPrefixes();
+        //$client->removeClientPrefixes();
         $client->addClientPrefix("10.5072", true);
         return $client;
     }
