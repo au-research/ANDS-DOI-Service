@@ -80,19 +80,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, sizeof($resultArray));
     }
 
-    /** @test */
-    public function it_should_claim_1_and_sync_unalocated_prefixes_in_db(){
-        $cc = 1;
-        $oldUnalloc = $this->repo->getUnalocatedPrefixes();
-        
-        $unAssignedPrefixes = $this->fabricaClient->claimNumberOfUnassignedPrefixes($cc);
-        $this->assertEquals(201, $this->fabricaClient->responseCode);
-        $this->assertEquals($cc, sizeof($unAssignedPrefixes));
-        $this->fabricaClient->syncUnallocatedPrefixes();
-        $this->assertEquals(200, $this->fabricaClient->responseCode);
-        $newUnalloc = $this->repo->getUnalocatedPrefixes();
-        //$this->assertGreaterThan(sizeof($oldUnalloc), sizeof($newUnalloc));
-    }
+
     
     /** @test */
     public function it_should_get_all_clients()
@@ -106,7 +94,9 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     public function it_should_assign_a_non_assigned_prefix_to_a_client()
     {
         // TODO: This test is failing in app.test environment and should be looked at again
-        $this->markTestSkipped("Test is failing in DOI app.test. Behaviour is inconsistent. Dev needs another look");
+        // It was failing due to having unallocated prefixes in the Database that we no longer have at DataCite
+
+       // $this->markTestSkipped("Test is failing in DOI app.test. Behaviour is inconsistent. Dev needs another look");
 
         // when there are unallocated prefix
         $unAllocatedPrefix = $this->repo->getOneUnallocatedPrefix();
@@ -119,6 +109,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         // we try to add the prefix and update it to fabrica
         $this->trustedClient->addClientPrefix($newPrefix);
         $this->fabricaClient->updateClientPrefixes($this->trustedClient);
+
         $this->assertFalse($this->fabricaClient->hasError(), "update client prefixes failed. Reason: ". $this->fabricaClient->getErrorMessage());
 
         // when we obtain the fabricaInfo for that client
@@ -127,6 +118,20 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 
         // the prefix is now assigned to the client
         $this->assertContains($newPrefix, json_encode($fabricaInfo));
+    }
+
+    /** @test */
+    public function it_should_claim_1_and_sync_unalocated_prefixes_in_db(){
+        $cc = 1;
+        $oldUnalloc = $this->repo->getUnalocatedPrefixes();
+
+        $unAssignedPrefixes = $this->fabricaClient->claimNumberOfUnassignedPrefixes($cc);
+        $this->assertEquals(201, $this->fabricaClient->responseCode);
+        $this->assertEquals($cc, sizeof($unAssignedPrefixes));
+        $this->fabricaClient->syncUnallocatedPrefixes();
+        $this->assertEquals(200, $this->fabricaClient->responseCode);
+        $newUnalloc = $this->repo->getUnalocatedPrefixes();
+        //$this->assertGreaterThan(sizeof($oldUnalloc), sizeof($newUnalloc));
     }
 
     /** @test */
