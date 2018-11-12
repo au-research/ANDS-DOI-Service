@@ -200,13 +200,12 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test  **/
-  /*  public function it_should_get_list_of_client_dois()
+   public function it_should_get_list_of_client_dois()
     {
-       // $pro_doi_client = getenv("GET_DOI_DATA_CENTRE");
-        $trustedCient = $this->fabricaClient->getClientByDataCiteSymbol("ANDS.CENTER14");
-        $dois = $trustedCient->getDOIs();
-        $this->assertTrue(count($dois)> 0);
-    } */
+        $dois = $this->testFabricaClient->getDOIs();
+        $this->assertTrue(count($dois) > 0);
+    }
+
 
     /**
      * @return \ANDS\DOI\FabricaClient
@@ -224,7 +223,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
             getenv("DATABASE_PASSWORD")
         ));
 
-        $this->fabricaClient->setDataciteUrl(getenv("DATACITE_FABRICA_API_URL"));
+        $this->fabricaClient->setDataciteUrl(getenv("TEST_DATACITE_FABRICA_API_URL"));
         $this->repo = $this->fabricaClient->getClientRepository();
 
     }
@@ -239,6 +238,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->trustedClient_AppId = getenv("TEST_CLIENT_APPID");
 
         $this->trustedClient = $this->repo->getByAppID($this->trustedClient_AppId);
+       // var_dump($this->trustedClient);
         $this->trustedClient_symbol = $this->trustedClient->datacite_symbol;
         if($this->trustedClient == null) {
             $params = [
@@ -257,6 +257,23 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 
     }
 
+    private function getTestFabricaClient()
+    {
+        $username = $this->trustedClient_symbol;
+        $password = getenv("DATACITE_FABRICA_PASSWORD");
+        $this->testFabricaClient = new \ANDS\DOI\FabricaClient($username, $password);
+
+        $this->testFabricaClient->setClientRepository(new \ANDS\DOI\Repository\ClientRepository(
+            getenv("DATABASE_URL"),
+            getenv("DATABASE"),
+            getenv("DATABASE_USERNAME"),
+            getenv("DATABASE_PASSWORD")
+        ));
+
+        $this->testFabricaClient->setDataciteUrl(getenv("DATACITE_FABRICA_API_URL"));
+
+    }
+
     private function removeTestClient(){
         $client = $this->repo->getByAppID($this->trustedClientName."APP_ID");
         $this->repo->deleteClientById($client->client_id);
@@ -272,6 +289,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
         $this->getFabricaClient();
         $this->getTestClient();
+        $this->getTestFabricaClient();
     }
 
 //    /**
