@@ -200,13 +200,13 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test  **/
-    public function it_should_get_list_of_client_dois()
+  /*  public function it_should_get_list_of_client_dois()
     {
        // $pro_doi_client = getenv("GET_DOI_DATA_CENTRE");
         $trustedCient = $this->fabricaClient->getClientByDataCiteSymbol("ANDS.CENTER14");
         $dois = $trustedCient->getDOIs();
         $this->assertTrue(count($dois)> 0);
-    }
+    } */
 
     /**
      * @return \ANDS\DOI\FabricaClient
