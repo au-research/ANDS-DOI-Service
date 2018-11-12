@@ -20,7 +20,7 @@ class FabricaClient implements DataCiteClient
 
     private $username;
     private $password;
-    private $dataciteUrl = 'https://app.test.datacite.org/';
+    private $dataciteUrl = 'https://app.datacite.org/';
 
     private $errors = array();
     private $messages = array();
@@ -50,6 +50,90 @@ class FabricaClient implements DataCiteClient
     public function get($doiId)
     {
         return "not implemented yet";
+    }
+
+    /**
+     * get list of a client's dois
+     * @param client_name
+     * @return mixed
+     */
+
+
+    /**
+     * delete a DOI (cannot delete a DOI that has been minted in the handle system
+     * @param $doiId
+     * @return null
+     */
+    public function deleteDOI($doiId,$client)
+    {
+        $headers = [
+            'Content-type' => 'application/json; charset=utf-8',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($client->username .":". $client->password),
+        ];
+        $response = "";
+        try {
+            $response = $this->http->delete("dois/".$doiId, $headers)->send();
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        $this->messages[] = $response;
+    }
+
+    /**
+     * get list of a client's dois
+     * @param client_name
+     * @return mixed
+     */
+
+
+    public function getDOIs()
+    {
+        $response = "";
+        $ret = "";
+        $return = '';
+        try{
+            $response = $this->http->get("/clients/".$this->username."/dois?page[size]=1000")->send();
+            $this->responseCode = $response->getStatusCode();
+            $ret = $response->json();
+            foreach($ret['data'] as $doi){
+                $return[] = strtoupper($doi['id']);
+            }
+            $page= 2;
+            $last_page = $ret['meta']['total-pages']+1;
+            for($i = $page;$i < $last_page;$i++){
+                $response = $this->http->get("/clients/".$this->username."/dois?page[number]=".$i."&page[size]=1000")->send();
+                $newret = $response->json();
+                foreach($newret['data'] as $doi){
+                    $return[] = strtoupper($doi['id']);
+                }
+            }
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        $this->messages[] = $response;
+
+        if(is_array($return)) {
+            $return = array_unique($return);
+        }
+
+        if(gettype($ret)!='string'){
+            return $return;
+        }else{
+            return "Client not found";
+        }
     }
 
     /**
@@ -290,6 +374,7 @@ class FabricaClient implements DataCiteClient
      */
     public function updateClientPrefixes(TrustedClient $client)
     {
+
         // a JSON representation of the client's prefix relationship
         $clientInfo = $this->getClientPrefixInfo($client);
 
@@ -297,13 +382,11 @@ class FabricaClient implements DataCiteClient
             $this->messages[] = "No Active Prefix assigned!";
             return;
         }
-
         $headers = [
             'Content-type' => 'application/json; charset=utf-8',
             'Accept' => 'application/json',
             'Authorization' => 'Basic ' . base64_encode($this->username .":". $this->password),
         ];
-
         $response = "";
 
         $request = $this->http->post('/client-prefixes', $headers, $clientInfo);
@@ -408,7 +491,7 @@ class FabricaClient implements DataCiteClient
      * we rely on our Database for this data
      */
     public function getClients()
-    {       
+    {
         $response = "";
         try{
             $response = $this->http->get('/clients', [], ["query" => ['provider-id'=>'ands']])->send();
@@ -437,11 +520,11 @@ class FabricaClient implements DataCiteClient
         foreach($result['data'] as $data){
 
             $pValue = $data['relationships']['prefix']['data']['id'];
-                $newPrefix = array("prefix_value" => $pValue,
-                    "datacite_id" => $data['id'],
-                    "created" => $data['attributes']['created']);
-                $this->clientRepository->addOrUpdatePrefix($newPrefix);
-                $newPrefixes[] = $pValue;
+            $newPrefix = array("prefix_value" => $pValue,
+                "datacite_id" => $data['id'],
+                "created" => $data['attributes']['created']);
+            $this->clientRepository->addOrUpdatePrefix($newPrefix);
+            $newPrefixes[] = $pValue;
         }
         return $newPrefixes;
     }
@@ -502,8 +585,8 @@ class FabricaClient implements DataCiteClient
     {
         try {
             $response = $this->http->get('/provider-prefixes',[], ["query" =>
-            ['client_id'=>$client->datacite_symbol,
-            'provider-id'=>'ands']])->send();
+                ['client_id'=>$client->datacite_symbol,
+                    'provider-id'=>'ands']])->send();
             $this->responseCode = $response->getStatusCode();
         }
         catch (ClientErrorResponseException $e) {
@@ -678,12 +761,10 @@ class FabricaClient implements DataCiteClient
     }
 
     /**
-     *
+     * @param TrustedClient $client
      * generates a JSON representation of a client and it's active prefix
      * note: only active prefix since datacite
      * rejects adding prefixes with a 500 response if prefix already given to the client
-     *
-     * @param TrustedClient $tClient
      * @return string
      */
     public function getClientPrefixInfo(TrustedClient $tClient)
@@ -692,7 +773,7 @@ class FabricaClient implements DataCiteClient
         $client = ["data" => ["type" => "clients",
             "id" => strtolower($tClient->datacite_symbol)]];
         $prefix = $this->getActivePrefix($tClient);
-        if (!$prefix) {
+        if(!$prefix){
             return false;
         }
         $relationships = ["client" => $client, "prefix" => $prefix];
@@ -736,8 +817,8 @@ class FabricaClient implements DataCiteClient
     public function getPrefixes(TrustedClient $client){
         $prefixes = array();
         foreach ($client->prefixes as $clientPrefix) {
-                $prefixes[] = array("id" => trim($clientPrefix->prefix->prefix_value, "/"),
-                    "type" => "prefixes");
+            $prefixes[] = array("id" => trim($clientPrefix->prefix->prefix_value, "/"),
+                "type" => "prefixes");
         }
         return array("data" => $prefixes);
     }
