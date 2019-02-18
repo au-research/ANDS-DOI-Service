@@ -20,7 +20,7 @@ class FabricaClient implements DataCiteClient
 
     private $username;
     private $password;
-    private $dataciteUrl = 'https://app.datacite.org/';
+    private $dataciteUrl = 'https://api.datacite.org/';
 
     private $errors = array();
     private $messages = array();
@@ -52,12 +52,37 @@ class FabricaClient implements DataCiteClient
         return "not implemented yet";
     }
 
+
     /**
      * get list of a client's dois
      * @param client_name
      * @return mixed
      */
-
+    public function getXML($doiId, $client)
+    {
+        $headers = [
+            'Content-type' => 'application/xhtml+xml; charset=utf-8',
+            'Accept' => 'application/xhtml+xml',
+            'Authorization' => 'Basic ' . base64_encode($client->username . ":" . $client->password),
+        ];
+        $response = "";
+        $ret = "we have an issue";
+        try {
+            $response = $this->http->get($doiId, $headers)->send();
+            $this->responseCode = $response->getStatusCode();
+            $ret = $response->getBody();
+            dd($ret);
+        } catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        } catch (ServerErrorResponseException $e) {
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        $this->messages[] = $response;
+        dd($response);
+        return $ret;
+    }
 
     /**
      * delete a DOI (cannot delete a DOI that has been minted in the handle system
@@ -99,18 +124,19 @@ class FabricaClient implements DataCiteClient
         $ret = "";
         $return = '';
         try{
-            $response = $this->http->get("/clients/".$this->username."/dois?page[size]=1000")->send();
+            $response = $this->http->get("/dois?client-id=".strtolower($this->username)."&page[cursor]=1&page[size]=1000")->send();
             $this->responseCode = $response->getStatusCode();
             $ret = $response->json();
             foreach($ret['data'] as $doi){
                 $return[] = strtoupper($doi['id']);
             }
             $page= 2;
-            $last_page = $ret['meta']['total-pages']+1;
+            $last_page = $ret['meta']['totalPages'] + 1;
+
             for($i = $page;$i < $last_page;$i++){
-                $response = $this->http->get("/clients/".$this->username."/dois?page[number]=".$i."&page[size]=1000")->send();
-                $newret = $response->json();
-                foreach($newret['data'] as $doi){
+                $response = $this->http->get($ret['links']['next'])->send();
+                $ret = $response->json();
+                foreach($ret['data'] as $doi){
                     $return[] = strtoupper($doi['id']);
                 }
             }
@@ -129,6 +155,64 @@ class FabricaClient implements DataCiteClient
             $return = array_unique($return);
         }
 
+        if(gettype($ret)!='string'){
+            return $return;
+        }else{
+            return "Client not found";
+        }
+    }
+    /**
+     * get list of a client's dois
+     * @param client_name
+     * @return mixed
+     */
+
+
+    public function getDOIURLs()
+    {
+        $response = "";
+        $ret = "";
+        $return = '';
+        try{
+            $response = $this->http->get("/dois?client-id=".strtolower($this->username)."&page[size]=1000&page[cursor]=1")->send();
+
+            $this->responseCode = $response->getStatusCode();
+            $ret = $response->json();
+
+            foreach($ret['data'] as $doi){
+                if($doi['id'] == "10.4225/08/5ab330902ddb8"){
+                    dd($doi);
+
+                }
+                $response2 = $this->http->get("/dois/".$doi['id'])->send();
+                $ret2 = $response2->json();
+                $return[strtoupper($doi['id'])] = Array('url' => $ret2["data"]["attributes"]["url"], 'xml' => $ret2["data"]["attributes"]["xml"]);
+            }
+            $page= 2;
+            $last_page = $ret['meta']['totalPages'] + 1;
+            for($i = $page;$i < $last_page;$i++){
+                $response = $this->http->get($ret['links']['next'])->send();
+                $ret = $response->json();
+                foreach($ret['data'] as $doi){
+                    $response2 = $this->http->get("/dois/".$doi['id'])->send();
+                    $ret2 = $response2->json();
+                    if(isset($ret2["data"]["attributes"]["xml"])) {
+                        $return[strtoupper($doi['id'])] = Array('url' => $ret2["data"]["attributes"]["url"], 'xml' => $ret2["data"]["attributes"]["xml"]);
+                    }else{
+                        var_dump($ret2["data"]["attributes"]);
+                    }
+                }
+            }
+        }
+        catch (ClientErrorResponseException $e) {
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        catch (ServerErrorResponseException $e){
+            $this->errors[] = $e->getMessage();
+            $this->responseCode = $e->getCode();
+        }
+        $this->messages[] = $response;
         if(gettype($ret)!='string'){
             return $return;
         }else{
