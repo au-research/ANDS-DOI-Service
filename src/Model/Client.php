@@ -95,9 +95,14 @@ class Client extends Model
      * each client can have One and only one active prefix that is used when minting NEW DOI
      *
      */
-    public function getActivePrefix()
+    public function getActivePrefix($mode = 'prod')
     {
-        return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->first();
+        if($mode == 'test'){
+            $is_test = 1;
+        }else{
+            $is_test = 0;
+        }
+        return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->where(["is_test"=>$is_test])->first();
     }
 
     /**
