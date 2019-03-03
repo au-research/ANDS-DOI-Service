@@ -24,10 +24,11 @@ class MdsClient implements DataCiteClient
      * @param $username
      * @param $password
      */
-    public function __construct($username, $password)
+    public function __construct($username, $password, $testPassword)
     {
         $this->username = $username;
         $this->password = $password;
+        $this->password = $testPassword;
     }
 
     /**
