@@ -146,9 +146,10 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
 
         $dataciteClient = new MdsClient(
             getenv("DATACITE_USERNAME"),
-            getenv("DATACITE_PASSWORD")
+            getenv("DATACITE_PASSWORD"),
+            getenv("DATACITE_TEST_PASSWORD")
         );
-        $dataciteClient->setDataciteUrl(getenv("DATACITE_URL"));
+        $dataciteClient->setDataciteUrl(getenv("DATACITE_TEST_URL"));
 
         $serviceProvider = new DOIServiceProvider(
             $clientRepository, $doiRepository, $dataciteClient
