@@ -78,7 +78,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint(
             "http://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
-        //var_dump($service);
+
         $this->assertTrue($result);
     }
 
@@ -420,8 +420,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
 
         $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
-        //$client->removeClientPrefixes();
-        $client->addClientPrefix("10.5072",'test', true);
+        $client->mode = 'test';
         return $client;
     }
 
