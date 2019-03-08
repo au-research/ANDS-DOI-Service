@@ -195,6 +195,7 @@ class DOIServiceProvider
         $doi = $this->insertNewDOI($doiValue,$xml,$url);
 
         // mint using dataciteClient
+
         $result = $this->dataciteClient->mint($doiValue, $url, $xml);
 
         if ($result === true) {
@@ -234,23 +235,31 @@ class DOIServiceProvider
     public function getNewDOI()
     {
         // get the first active prefix for this authenticated client
-        $prefix = "10.5072";
+        $prefix = "";
+        $testStr = "";
 
         $client = $this->getAuthenticatedClient();
+
 
         //if this client is not in test mode grab their production prefix
         if(sizeof($client->prefixes) > 0 && $client->mode !== 'test'){
             foreach ($client->prefixes as $clientPrefix) {
-                if($clientPrefix->active) {
+                if($clientPrefix->active && $clientPrefix->is_test == 0) {
                     $prefix = $clientPrefix->prefix->prefix_value;
                     break;
                 }
             }
         }
-
+        if(sizeof($client->prefixes) > 0 && $client->mode == 'test'){
+            foreach ($client->prefixes as $clientPrefix) {
+                if($clientPrefix->active && $clientPrefix->is_test == 1) {
+                    $prefix = $clientPrefix->prefix->prefix_value;
+                    $testStr =  "TEST_DOI_";
+                    break;
+                }
+            }
+        }
         $prefix = ends_with($prefix, '/') ? $prefix : $prefix .'/';
-
-        $testStr = $prefix == '10.5072/' ? "TEST_DOI_" : "";
 
         $doiValue = uniqid();
 

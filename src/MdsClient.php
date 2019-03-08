@@ -28,7 +28,7 @@ class MdsClient implements DataCiteClient
     {
         $this->username = $username;
         $this->password = $password;
-        $this->password = $testPassword;
+        $this->testPassword = $testPassword;
     }
 
     /**
@@ -141,9 +141,14 @@ class MdsClient implements DataCiteClient
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        if(strpos($url,'test')){
+            curl_setopt($ch, CURLOPT_USERPWD,
+                $this->username . ":" . $this->testPassword);
+        }else{
+            curl_setopt($ch, CURLOPT_USERPWD,
+                $this->username . ":" . $this->password);
+        }
 
-        curl_setopt($ch, CURLOPT_USERPWD,
-            $this->username . ":" . $this->password);
         curl_setopt($ch, CURLOPT_HTTPHEADER,
             array("Content-Type:application/xml;charset=UTF-8"));
 
