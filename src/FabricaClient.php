@@ -692,6 +692,12 @@ class FabricaClient implements DataCiteClient
                     // If the client doesn't exist then add it to the test fabrica'
                     $trustedClient = $this->clientRepository->getBySymbol($centre['attributes']['symbol']);
                     $this->addClient($trustedClient,'test');
+                }else{
+                    // If the client does exist then update it on the test fabrica'
+                    $trustedClient = $this->clientRepository->getBySymbol($centre['attributes']['symbol']);
+                    if($trustedClient) {
+                        $this->updateClient($trustedClient, 'test');
+                    }
                 }
            }
         }
