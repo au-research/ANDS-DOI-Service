@@ -114,6 +114,17 @@ class ClientRepository
     }
 
     /**
+     * @param $appID
+     * @return Client
+     */
+    public function getBySymbol($symbol)
+    {
+        return Client::where(function ($query) use ($symbol) {
+            $query->where('datacite_symbol', '=', $symbol);
+        })->first();
+    }
+
+    /**
      * @param $id
      */
     public function deleteClientById($id)
@@ -133,10 +144,15 @@ class ClientRepository
      * find all prefixes in the database that has no clients assigned to
      * the exclude list was added to allow eg: legacy prefixes are not included in result
      */
-    public function getUnalocatedPrefixes($excluding = [])
+    public function getUnalocatedPrefixes($mode = 'prod',$excluding = [])
     {
+        if($mode == 'test') {
+            $is_test = 1;
+        }else{
+            $is_test = 0;
+        }
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
-        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->get();
+        $prefixes = Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->where("is_test",$is_test)->get();
         return $prefixes;
     }
 
@@ -148,10 +164,15 @@ class ClientRepository
      * eg release 28 when all trusted clients had to get a new prefix
      * the exclude list was added to allow eg: legacy prefixes are not included in result
      */
-    public function getOneUnallocatedPrefix($excluding = [])
+    public function getOneUnallocatedPrefix($mode = 'prod', $excluding = [])
     {
+        if($mode == 'test') {
+            $is_test = 1;
+        }else{
+            $is_test = 0;
+        }
         $usedPrefixIds = ClientPrefixes::select('prefix_id')->get();
-        return Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->first();
+        return Prefix::whereNotIn('id', $usedPrefixIds)->whereNotIn("prefix_value", $excluding)->where("is_test",$is_test)->first();
 
     }
 

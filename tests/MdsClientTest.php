@@ -27,7 +27,7 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
     public function test_construct_object()
     {
         $this->assertEquals(
-            $this->client->getDataciteUrl(), getenv('DATACITE_URL')
+            $this->client->getDataciteUrl(), getenv('DATACITE_TEST_URL')
         );
     }
 
@@ -99,8 +99,9 @@ class MdsClientTest extends PHPUnit_Framework_TestCase
     {
         $username = getenv('DATACITE_USERNAME');
         $password = getenv('DATACITE_PASSWORD');
-        $this->client = new MdsClient($username, $password);
-        $this->client->setDataciteUrl(getenv('DATACITE_URL'));
+        $testPassword = getenv('DATACITE_TEST_PASSWORD');
+        $this->client = new MdsClient($username, $password, $testPassword);
+        $this->client->setDataciteUrl(getenv('DATACITE_TEST_URL'));
     }
 
     public function setUpTestDOI(){

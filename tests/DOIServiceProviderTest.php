@@ -78,6 +78,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint(
             "http://devl.ands.org.au/minh/", $this->getTestXML(),false
         );
+
         $this->assertTrue($result);
     }
 
@@ -371,7 +372,6 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $result = $service->mint(
             "https://devl.ands.org.au/minh/", file_get_contents(__DIR__ . "/assets/sample_utf8.xml"),false
         );
-
         $this->assertTrue($result);
     }
 
@@ -420,8 +420,7 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
 
         $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
-        $client->removeClientPrefixes();
-        $client->addClientPrefix("10.5072", true);
+        $client->mode = 'test';
         return $client;
     }
 
@@ -453,9 +452,10 @@ class DOIServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $dataciteClient = new MdsClient(
             getenv("DATACITE_USERNAME"),
-            getenv("DATACITE_PASSWORD")
+            getenv("DATACITE_PASSWORD"),
+            getenv("DATACITE_TEST_PASSWORD")
         );
-        $dataciteClient->setDataciteUrl(getenv("DATACITE_URL"));
+        $dataciteClient->setDataciteUrl(getenv("DATACITE_TEST_URL"));
 
         $serviceProvider = new DOIServiceProvider(
             $clientRepository, $doiRepository, $dataciteClient

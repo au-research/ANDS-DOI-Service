@@ -95,9 +95,14 @@ class Client extends Model
      * each client can have One and only one active prefix that is used when minting NEW DOI
      *
      */
-    public function getActivePrefix()
+    public function getActivePrefix($mode = 'prod')
     {
-        return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->first();
+        if($mode == 'test'){
+            $is_test = 1;
+        }else{
+            $is_test = 0;
+        }
+        return ClientPrefixes::where("client_id", $this->client_id)->where(["active"=>true])->where(["is_test"=>$is_test])->first();
     }
 
     /**
@@ -134,7 +139,7 @@ class Client extends Model
      *
      * assigns a prefix to a client
      */
-    public function addClientPrefix($prefix_value, $active = true){
+    public function addClientPrefix($prefix_value, $mode = 'prod',$active = true){
 
         $prefix = null;
         $prefix_value = trim($prefix_value);
@@ -142,8 +147,13 @@ class Client extends Model
             return;
 
         //set all other prefixes for this client as non active if this prefix is the active one
+        if($mode == 'test'){
+            $is_test = 1;
+        }else{
+            $is_test = 0;
+        }
         if($active){
-            ClientPrefixes::where("client_id", $this->client_id)->update(["active"=>false]);
+            ClientPrefixes::where("client_id", $this->client_id)->where("is_test", $is_test)->update(["active"=>false]);
         }
 
         try {
@@ -155,7 +165,7 @@ class Client extends Model
                     ->where("client_id", $this->client_id)->first();
                 if ($cp != null) {
                     ClientPrefixes::where("prefix_id", $prefix->id)
-                        ->where("client_id", $this->client_id)->update(["active"=>$active]);
+                        ->where("client_id", $this->client_id)->update(["active"=>$active,"is_test" => $is_test]);
                     return;
                 }
             }
@@ -166,11 +176,11 @@ class Client extends Model
         // should never happen since all prefixes must be preloaded
         if($prefix == null)// create a new prefix and assign it to the Client
         {
-            $prefix = new Prefix(["prefix_value" => $prefix_value]);
+            $prefix = new Prefix(["prefix_value" => $prefix_value,"is_test" => $is_test]);
             $prefix->save();
         }
 
-        $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active]));
+        $this->prefixes()->save(new ClientPrefixes(["prefix_id" => $prefix->id, "active"=>$active, "is_test"=>$is_test]));
     }
 
     /**

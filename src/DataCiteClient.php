@@ -15,7 +15,7 @@ Interface DataCiteClient
      * @param $username
      * @param $password
      */
-    public function __construct($username, $password);
+    public function __construct($username, $password, $testPassword);
    
 
     /**

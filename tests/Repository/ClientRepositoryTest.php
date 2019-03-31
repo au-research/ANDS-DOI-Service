@@ -112,7 +112,7 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_should_add_a_prefix_to_test_client()
     {
         $client = $this->repo->getByAppID("PHPUNIT_TEST_APP_ID");
-        $client->removeClientPrefixes();
+        $client->removeClientPrefix("10.5072");
         $this->assertFalse($client->hasPrefix("10.5072"));
         $client->addClientPrefix("10.5072", true);
         $this->assertTrue($client->hasPrefix("10.5072"));
@@ -221,9 +221,9 @@ class ClientRepositoryTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function tearDown()
-    {
-        parent::tearDown();
-        $this->removeTestClient();
-    }
+  //  public function tearDown()
+  //   {
+  //      parent::tearDown();
+       // $this->removeTestClient();
+  //  }
 }
