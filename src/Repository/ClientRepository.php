@@ -269,13 +269,15 @@ class ClientRepository
      * @param string $database
      * @param string $username
      * @param string $password
+     * @param int $port
      * @internal param string $databasePassword
      */
     public function __construct(
         $databaseURL,
         $database = "dbs_dois",
         $username = "webuser",
-        $password = ""
+        $password = "",
+        $port = 3306
     ) {
         $capsule = new Capsule;
         $capsule->addConnection(
@@ -285,6 +287,7 @@ class ClientRepository
                 'database' => $database,
                 'username' => $username,
                 'password' => $password,
+                'port' => $port,
                 'charset' => 'utf8',
                 'collation' => 'utf8_unicode_ci',
                 'prefix' => '',
