@@ -24,7 +24,6 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         // mint a DOI, make sure it exists in the database
         $service = $this->getServiceProvider();
         $service->setAuthenticatedClient($this->getTestClient());
-
         $result = $service->mint(
             "https://devl.ands.org.au/minh/", $this->getTestXML()
         );
@@ -48,7 +47,7 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repo = $this->getDoiRepository();
 
-        $doiID = '10.5072/00/AutomatedTest'.uniqid();
+        $doiID = '10.70131/TEST_DOI_'.uniqid();
         $doi = $repo->doiCreate([
             'doi_id' => $doiID,
             'publisher' => 'ANDS',
@@ -99,7 +98,7 @@ class DoiRepositoryTest extends PHPUnit_Framework_TestCase
         $dotenv->load();
 
         $client = Client::where('app_id', getenv('TEST_CLIENT_APPID'))->first();
-        $client->addClientPrefix("10.5072");
+        $client->addClientPrefix("10.70131");
         return $client;
     }
 
