@@ -29,6 +29,7 @@ class MdsClient implements DataCiteClient
         $this->username = $username;
         $this->password = $password;
         $this->testPassword = $testPassword;
+        //dd($this->username,$this->password, $this->testPassword);
     }
 
     /**
@@ -164,6 +165,7 @@ class MdsClient implements DataCiteClient
         $output = curl_exec($ch);
 
         $outputINFO = curl_getinfo($ch);
+
 
         $this->log([
             "httpcode" => $outputINFO['http_code'],

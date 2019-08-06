@@ -669,7 +669,7 @@ class FabricaClient implements DataCiteClient
 
         $this->setDataciteUrl(getenv("DATACITE_FABRICA_API_TEST_URL"));
 
-        //check if the prod client is an old test client or if it was a manually minted services acount
+        //check if the prod client is an old test client or if it was a manually minted services account
         foreach($centres['data'] as $centre){
            if(strpos($centre['attributes']['name'],'Test:') !== 0
                && $centre['attributes']['symbol'] != 'ANDS.C190'
@@ -691,7 +691,9 @@ class FabricaClient implements DataCiteClient
                 if ($this->responseCode == 404) {
                     // If the client doesn't exist then add it to the test fabrica'
                     $trustedClient = $this->clientRepository->getBySymbol($centre['attributes']['symbol']);
-                    $this->addClient($trustedClient,'test');
+                    if($trustedClient) {
+                        $this->addClient($trustedClient, 'test');
+                    }
                 }else{
                     // If the client does exist then update it on the test fabrica'
                     $trustedClient = $this->clientRepository->getBySymbol($centre['attributes']['symbol']);

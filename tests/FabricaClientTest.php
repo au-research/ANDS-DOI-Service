@@ -174,13 +174,14 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("ands.centre-0", $trustedCient['data']['id']);
     }
 
-//    /** @test  **/
-//    public function it_should_add_a_new_client_to_datacite()
-//    {
-//        $this->fabricaClient->addClient($this->trustedClient);
-//        $this->assertEquals(201, $this->fabricaClient->responseCode);
-//        $this->assertFalse($this->fabricaClient->hasError());
-//    }
+    /** @test  **/
+    public function it_should_add_a_new_client_to_datacite()
+    {
+        $this->markTestSkipped("Can't add a client that already exists in datacite");
+        $this->fabricaClient->addClient($this->trustedClient, "test");
+        $this->assertEquals(201, $this->fabricaClient->responseCode);
+        $this->assertFalse($this->fabricaClient->hasError());
+    }
 // WE SHOULD'T DELETE CLIENTS ON DATACITE (IT WORKS THOUGH)
 //    /** @test **/
 //    public function it_should_delete_a_client_on_datacite(){
@@ -262,7 +263,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
 
         $this->trustedClient = $this->repo->getByAppID($this->trustedClient_AppId);
 
-        $this->trustedClient_symbol = $this->trustedClient->datacite_symbol;
+
         if($this->trustedClient == null) {
             $params = [
                 'ip_address' => "8.8.8.8",
@@ -275,7 +276,7 @@ class FabricaClientTest extends PHPUnit_Framework_TestCase
             $this->trustedClient = $this->repo->create($params);
             $this->trustedClient->save();
         }
-
+        $this->trustedClient_symbol = $this->trustedClient->datacite_symbol;
 
     }
 
